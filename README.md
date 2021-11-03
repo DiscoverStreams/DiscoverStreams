@@ -1,2 +1,2 @@
 # DiscoverStreams
-Visualization for USGS Powell grant project
+RShiny Visualization for USGS Powell grant project
