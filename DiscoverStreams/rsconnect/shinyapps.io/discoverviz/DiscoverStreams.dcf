@@ -1,0 +1,12 @@
+name: DiscoverStreams
+title: DiscoverStreams
+username:
+account: discoverviz
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2679081
+bundleId: 3527379
+url: https://discoverviz.shinyapps.io/DiscoverStreams/
+when: 1597705622.34183
+asMultiple: FALSE
+asStatic: FALSE
