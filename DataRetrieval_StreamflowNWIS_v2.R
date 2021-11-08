@@ -5,7 +5,7 @@ library(tidyverse)
 library(DataExplorer)
 library(dplyr)
 library(jsonlite)
-library(jsonify)
+
 library(dataRetrieval)
 
 
@@ -85,12 +85,30 @@ legend("topleft",
 
 
 
+
 ### STREAMFLOW (NWIS) - SCOTT VALLEY, CALIFORNIA ###
 site_number <- c("11519500", "11519000", "11518200", "11518050")
 site_info <- readNWISsite(site_number)
 color_sv <- c("aquamarine3", "darkblue", "darkred", "burlywood3")
 
+### WATER USE (NWIS) ###
+site_number <- "11519500"
+state <- site_info$state_cd
+county <- site_info$county_cd
 
+
+waterUse_SV <- readNWISuse(
+        stateCd = state,
+        countyCd = county,
+        years = "ALL",
+        categories = "ALL",
+        convertType = TRUE,
+        transform = FALSE
+)
+
+raw_daily_StJoseph <- drop_columns(raw_daily_StJoseph, c("agency_cd", "X_00060_00003_cd"))
+
+colnames(raw_daily_StJoseph) <- c("SiteNum", "Date", "Discharge_cfs")
 
 ### STREAMFLOW (NWIS) - KAWEAH, CALIFORNIA ###
 site_number <- c("11209500", "11208600", "11208000", "11208730", "11208615", "11206820")
@@ -200,6 +218,20 @@ legend("topleft", legend = site_info$station_nm, lty = 1:1, col = c("darkorchid"
 
 smoothScatter(raw_daily_USGS$Date, raw_daily_USGS$Discharge_cfs, main = site_info$station_nm, xlab = "Date", ylab = "Discharge (Cfs)")
 
+
+
+### All Sites Info ###
+site_number <- c("04097540", "04096900", "04101500")
+site_info <- readNWISsite(site_number)
+site_stats <- readNWISstat(
+        site_number,
+        parameter_code,
+        startDate = "",
+        endDate = "",
+        convertType = TRUE,
+        statReportType = "monthly",
+        statType = "mean"
+)
 
 
 
