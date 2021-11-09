@@ -106,6 +106,13 @@ waterUse_SV <- readNWISuse(
         transform = FALSE
 )
 
+attributes <- colnames(waterUse_SV)
+view(attributes)
+
+waterUSE_SV_select <- waterUse_SV[ , c(5,18)]
+
+### STREAMFLOW - ST JOSEPH ###
+
 raw_daily_StJoseph <- drop_columns(raw_daily_StJoseph, c("agency_cd", "X_00060_00003_cd"))
 
 colnames(raw_daily_StJoseph) <- c("SiteNum", "Date", "Discharge_cfs")
