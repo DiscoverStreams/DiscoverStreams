@@ -45,29 +45,18 @@ raw_daily_Prairie2 <- drop_columns(raw_daily_Prairie2, c("agency_cd", "X_00060_0
 
 colnames(raw_daily_Prairie2) <- c("SiteNum", "Date", "Discharge_cfs")
 
-### St. Joseph River ###
-site_number <- c("04101500")
-raw_daily_StJoseph <- readNWISdv(site_number, parameter_code, start_date, end_date)
-
-raw_daily_StJoseph <- drop_columns(raw_daily_StJoseph, c("agency_cd", "X_00060_00003_cd"))
-
-colnames(raw_daily_StJoseph) <- c("SiteNum", "Date", "Discharge_cfs")
-
-### DataExplorer - Plot Streamflow ###
-# DataExplorer::create_report(raw_daily_USGS)
-
-# x <- raw_daily_USGS$Date
-# y <- raw_daily_USGS$Discharge_cfs
-# z <- raw_daily_USGS$SiteNum
 
 
-plot(raw_daily_USGS$Date, raw_daily_USGS$Discharge_cfs,
+
+### PLOTS ###
+
+plot(raw_daily_Prairie1$Date, raw_daily_Prairie1$Discharge_cfs,
      type = "l", 
      # main = "Michigan", 
      xlab = "Date", 
      ylab = "Discharge (Cfs)",
      # log = "x,y",
-     col = color_sv[4])
+     col = color_mi[1])
 # lines(raw_daily_Prairie2$Date, raw_daily_Prairie2$Discharge_cfs,
 #       type = "l",
 #       col = "darkorchid")
@@ -82,7 +71,9 @@ legend("topleft",
        title = "Station",
        cex = 0.6)
 
-
+ggplot(raw_daily_Prairie1, aes(x=Date, y=Discharge_cfs)) +
+        geom_line(color = color_mi[1]) +
+        scale_y_continuous(trans='log10')
 
 
 
@@ -93,6 +84,9 @@ color_sv <- c("aquamarine3", "darkblue", "darkred", "burlywood3")
 
 ### WATER USE (NWIS) ###
 site_number <- "11519500"
+site_number <- "04101500" ## St. Joseph
+site_number <- "04097540" ## Prairie River
+site_number <- "04097540" ## Nottawa Creek
 state <- site_info$state_cd
 county <- site_info$county_cd
 
@@ -111,119 +105,41 @@ view(attributes)
 
 waterUSE_SV_select <- waterUse_SV[ , c(5,18)]
 
-### STREAMFLOW - ST JOSEPH ###
+waterUse_StJo <- readNWISuse(
+        stateCd = state,
+        countyCd = county,
+        years = "ALL",
+        categories = "ALL",
+        convertType = TRUE,
+        transform = FALSE
+)
 
-raw_daily_StJoseph <- drop_columns(raw_daily_StJoseph, c("agency_cd", "X_00060_00003_cd"))
+waterUSE_StJo_select <- waterUse_StJo[ , c(5,18)]
 
-colnames(raw_daily_StJoseph) <- c("SiteNum", "Date", "Discharge_cfs")
+waterUse_Pr <- readNWISuse(
+        stateCd = state,
+        countyCd = county,
+        years = "ALL",
+        categories = "ALL",
+        convertType = TRUE,
+        transform = FALSE
+)
 
-### STREAMFLOW (NWIS) - KAWEAH, CALIFORNIA ###
-site_number <- c("11209500", "11208600", "11208000", "11208730", "11208615", "11206820")
-site_info <- readNWISsite(site_number)
-color_kv <- c("darkorchid", "black", "deepskyblue", "chartreuse4", "coral2")
-
-### Kaweah R at Kaweah ###
-site_number <- c("11518050")   
-site_name <- site_info$station_nm
-
-raw_daily_USGS <- readNWISdv(site_number, parameter_code, start_date, end_date)
-
-raw_daily_USGS <- drop_columns(raw_daily_USGS, c("agency_cd", "X_00060_00003_cd"))
-
-colnames(raw_daily_USGS) <- c("SiteNum", "Date", "Discharge_cfs")
-
-daily_streamflow_CA <- raw_daily_USGS
-# view(daily_streamflow_CA)
+waterUSE_Pr_select <- waterUse_Pr[ , c(5,18)]
 
 
-### Kaweah R Below Conduit 2 Near Hammond ###
-site_number <- c("11208600")
-site_name <- site_info$station_nm
+waterUse_NoCr <- readNWISuse(
+        stateCd = state,
+        countyCd = county,
+        years = "ALL",
+        categories = "ALL",
+        convertType = TRUE,
+        transform = FALSE
+)
 
-raw_daily_USGS <- readNWISdv(site_number, parameter_code, start_date, end_date)
-
-raw_daily_USGS <- drop_columns(raw_daily_USGS, c("agency_cd", "site_no", "X_00060_00003_cd"))
-
-colnames(raw_daily_USGS) <- c("Date", site_name[1])
-
-# daily_streamflow_CA <- left_join(daily_streamflow_CA, raw_daily_USGS, by "Date")
-# view(daily_streamflow_CA)
+waterUSE_NoCr_select <- waterUse_NoCr[ , c(5,18)]
 
 
-### Kaweah R Marble Fork ###
-site_number <- c("11208000")
-site_name <- site_info$station_nm
-
-raw_daily_USGS <- readNWISdv(site_number, parameter_code, start_date, end_date)
-
-raw_daily_USGS <- drop_columns(raw_daily_USGS, c("agency_cd", "site_no", "X_00060_00003_cd"))
-
-colnames(raw_daily_USGS) <- c("Date", site_name[1])
-
-daily_streamflow_CA <- left_join(daily_streamflow_CA, raw_daily_USGS)
-# view(daily_streamflow_CA)
-
-
-### EF Kaweah R Near Three Rivers ###
-site_number <- c("11208730")   
-site_name <- site_info$station_nm
-
-raw_daily_USGS <- readNWISdv(site_number, parameter_code, start_date, end_date)
-print(raw_daily_USGS [raw_daily_USGS == 0.00])
-raw_daily_USGS <- drop_columns(raw_daily_USGS, c("agency_cd", "site_no", "X_00060_00003_cd"))
-
-raw_daily_USGS$X_00060_00003 [raw_daily_USGS$X_00060_00003 == 0.00] <- 0.001
-
-colnames(raw_daily_USGS) <- c("Date", site_name[1])
-
-
-daily_streamflow_CA <- left_join(daily_streamflow_CA, raw_daily_USGS)
-# view(daily_streamflow_CA)
-
-
-### EF Kaweah R Below Monarch Near Hamond ---> NO DATA!!! ###
-site_number <- c("11208615")   
-site_name <- site_info$station_nm
-
-raw_daily_USGS <- readNWISdv(site_number, parameter_code, start_date, end_date)
-
-raw_daily_USGS <- drop_columns(raw_daily_USGS, c("agency_cd", "site_no", "X_00060_00003_cd"))
-
-colnames(raw_daily_USGS) <- c("Date", site_name[1])
-
-daily_streamflow_CA <- left_join(daily_streamflow_CA, raw_daily_USGS)
-# view(daily_streamflow_CA)
-
-
-### Kaweah R Marble Fork Above Horse C Near Lodge Pole ###
-site_number <- c("11206820")   
-site_name <- site_info$station_nm
-
-raw_daily_USGS <- readNWISdv(site_number, parameter_code, start_date, end_date)
-
-raw_daily_USGS <- drop_columns(raw_daily_USGS, c("agency_cd", "site_no", "X_00060_00003_cd"))
-
-colnames(raw_daily_USGS) <- c("Date", site_name[1])
-
-daily_streamflow_CA <- left_join(daily_streamflow_CA, raw_daily_USGS)
-view(daily_streamflow_CA)
-
-
-x <- raw_daily_USGS$Date
-y <- raw_daily_USGS$Discharge_cfs
-z <- raw_daily_USGS$SiteNum
-
-plot(x, y, 
-     type = "l", 
-     main = "Michigan", 
-     xlab = "Date", 
-     ylab = "Discharge (Cfs)",
-     col = ifelse(raw_daily_USGS$SiteNum == "04096900","darkorchid", 
-                  ifelse(raw_daily_USGS$SiteNum == "04097540","deepskyblue", 
-                         "grey")))
-legend("topleft", legend = site_info$station_nm, lty = 1:1, col = c("darkorchid", "deepskyblue"), title = "Stations", cex = 0.6)
-
-smoothScatter(raw_daily_USGS$Date, raw_daily_USGS$Discharge_cfs, main = site_info$station_nm, xlab = "Date", ylab = "Discharge (Cfs)")
 
 
 
