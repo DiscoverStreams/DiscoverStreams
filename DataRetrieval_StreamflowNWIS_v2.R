@@ -15,7 +15,10 @@ dname <- paste(wname,"data",sep="/") # will open data file in workikng directory
 oname <- paste(wname,"outputs",sep="/") # will open outputs file in workikng directory
 pname<-paste(wname,"plots",sep="/") # will open plots file in workikng directory
 
-
+### STREAMFLOW (NWIS) - SCOTT VALLEY, CALIFORNIA ###
+site_number <- c("11519500", "11519000", "11518200", "11518050")
+site_info <- readNWISsite(site_number)
+color_sv <- c("aquamarine3", "darkblue", "darkred", "burlywood3")
 
 ### STREAMFLOW (NWIS) - MICHIGAN ###
 site_number <- c("04097540", "04096900", "04101500")
@@ -35,15 +38,6 @@ raw_daily_Prairie1 <- readNWISdv(site_number, parameter_code, start_date, end_da
 raw_daily_Prairie1 <- drop_columns(raw_daily_Prairie1, c("agency_cd", "X_00060_00003_cd"))
 
 colnames(raw_daily_Prairie1) <- c("SiteNum", "Date", "Discharge_cfs")
-
-### Nottawa Creek - feeds Prairie River ###
-site_number <- c("04096900")
-
-raw_daily_Prairie2 <- readNWISdv(site_number, parameter_code, start_date, end_date)
-
-raw_daily_Prairie2 <- drop_columns(raw_daily_Prairie2, c("agency_cd", "X_00060_00003_cd"))
-
-colnames(raw_daily_Prairie2) <- c("SiteNum", "Date", "Discharge_cfs")
 
 
 
@@ -77,10 +71,9 @@ ggplot(raw_daily_Prairie1, aes(x=Date, y=Discharge_cfs)) +
 
 
 
-### STREAMFLOW (NWIS) - SCOTT VALLEY, CALIFORNIA ###
-site_number <- c("11519500", "11519000", "11518200", "11518050")
-site_info <- readNWISsite(site_number)
-color_sv <- c("aquamarine3", "darkblue", "darkred", "burlywood3")
+
+
+
 
 ### WATER USE (NWIS) ###
 site_number <- "11519500"
@@ -128,16 +121,7 @@ waterUse_Pr <- readNWISuse(
 waterUSE_Pr_select <- waterUse_Pr[ , c(5,18)]
 
 
-waterUse_NoCr <- readNWISuse(
-        stateCd = state,
-        countyCd = county,
-        years = "ALL",
-        categories = "ALL",
-        convertType = TRUE,
-        transform = FALSE
-)
 
-waterUSE_NoCr_select <- waterUse_NoCr[ , c(5,18)]
 
 
 
