@@ -18,10 +18,12 @@ pname<-paste(wname,"plots",sep="/") # will open plots file in workikng directory
 ### STREAMFLOW (NWIS) - SCOTT VALLEY, CALIFORNIA ###
 sites_ca <- c("11519500", "11519000", "11518200", "11518050")
 color_ca <- c("aquamarine3", "darkblue", "darkred", "burlywood3")
+## #66cdaa, #01178b, #8a0f00, #cdaa7d
 
 ### STREAMFLOW (NWIS) - PRAIRIE RIVER, MICHIGAN ###
 sites_mi <- c("04097540", "040975253", "04097526", "04097528", "040975296", "04097529", "040975299", "04097530", "04097540", "0409754049", "0409754132", "0409754153", "0409754167", "04097500" )
-color_mi <- c("deepskyblue", "cadetblue2", "deepskyblue4")
+color_mi <- c("deepskyblue", "cadetblue2", "deepskyblue4") 
+## #01bfff, #8ee5ee, #01688b
 
 ### STREAMFLOW (NWIS) - KANSAS ###
 
@@ -34,7 +36,6 @@ parameter_names <- c("Discharge, cubic feet per second")
 start_date <- ""
 end_date <- ""
 
-site_info <- readNWISsite(site_number)
 
 raw_daily <- readNWISdv(site_number, parameter_code, start_date, end_date)
 
@@ -62,10 +63,13 @@ p + scale_x_date(limits = c(min, max))
 
 
 ### WATER USE (NWIS) ###
-site_number <- "11519500"
-site_number <- "04101500" ## St. Joseph
-site_number <- "04097540" ## Prairie River
-site_number <- "04097540" ## Nottawa Creek
+site_number <- "11519500" ## Scott River
+site_number <- "04097528" ## Prairie River - Branch County
+site_number <- "04097540" ## Prairie River - St. Joseph County
+site_number <- "04101500" ## St. Joseph River
+
+site_info <- readNWISsite(site_number)
+
 state <- site_info$state_cd
 county <- site_info$county_cd
 
@@ -82,7 +86,9 @@ waterUse_SV <- readNWISuse(
 attributes <- colnames(waterUse_SV)
 view(attributes)
 
-waterUSE_SV_select <- waterUse_SV[ , c(5,18)]
+waterUSE_SV_select <- waterUse_SV[ , c(5,243)]
+# 243 	Irrigation..Total.total.consumptive.use..in.Mgal.d
+
 
 waterUse_StJo <- readNWISuse(
         stateCd = state,
