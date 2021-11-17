@@ -16,60 +16,46 @@ oname <- paste(wname,"outputs",sep="/") # will open outputs file in workikng dir
 pname<-paste(wname,"plots",sep="/") # will open plots file in workikng directory
 
 ### STREAMFLOW (NWIS) - SCOTT VALLEY, CALIFORNIA ###
-site_number <- c("11519500", "11519000", "11518200", "11518050")
-site_info <- readNWISsite(site_number)
-color_sv <- c("aquamarine3", "darkblue", "darkred", "burlywood3")
+sites_ca <- c("11519500", "11519000", "11518200", "11518050")
+color_ca <- c("aquamarine3", "darkblue", "darkred", "burlywood3")
 
-### STREAMFLOW (NWIS) - MICHIGAN ###
-site_number <- c("04097540", "04096900", "04101500")
-site_info <- readNWISsite(site_number)
-color_mi <- c("darkorchid", "black", "deepskyblue")
+### STREAMFLOW (NWIS) - PRAIRIE RIVER, MICHIGAN ###
+sites_mi <- c("04097540", "040975253", "04097526", "04097528", "040975296", "04097529", "040975299", "04097530", "04097540", "0409754049", "0409754132", "0409754153", "0409754167", "04097500" )
+color_mi <- c("deepskyblue", "cadetblue2", "deepskyblue4")
 
-### Prairie River near Nottawa ###
-site_number <- c("04097540")
-# view(Cheney_info)
+### STREAMFLOW (NWIS) - KANSAS ###
+
+
+
+### RETRIEVE STREAMFLOW DATA FROM NWIS ###
+site_number <- sites_ca[4]
 parameter_code <- c("00060")
 parameter_names <- c("Discharge, cubic feet per second")
 start_date <- ""
 end_date <- ""
 
-raw_daily_Prairie1 <- readNWISdv(site_number, parameter_code, start_date, end_date)
+site_info <- readNWISsite(site_number)
 
-raw_daily_Prairie1 <- drop_columns(raw_daily_Prairie1, c("agency_cd", "X_00060_00003_cd"))
+raw_daily <- readNWISdv(site_number, parameter_code, start_date, end_date)
 
-colnames(raw_daily_Prairie1) <- c("SiteNum", "Date", "Discharge_cfs")
+# REFORMAT DATA
+raw_daily <- drop_columns(raw_daily, c("site_no", "agency_cd", "X_00060_00003_cd"))
+
+colnames(raw_daily) <- c("Date", "Discharge_cfs")
 
 
 
 
 ### PLOTS ###
 
-plot(raw_daily_Prairie1$Date, raw_daily_Prairie1$Discharge_cfs,
-     type = "l", 
-     # main = "Michigan", 
-     xlab = "Date", 
-     ylab = "Discharge (Cfs)",
-     # log = "x,y",
-     col = color_mi[1])
-# lines(raw_daily_Prairie2$Date, raw_daily_Prairie2$Discharge_cfs,
-#       type = "l",
-#       col = "darkorchid")
-# lines(raw_daily_Prairie1$Date, raw_daily_Prairie1$Discharge_cfs, 
-#       type = "l",
-#       col = "deepskyblue")
-legend("topleft", 
-       legend = site_info$station_nm, 
-       lty = 1:1, 
-       col = color_sv[4], 
-       # col = c("darkorchid", "deepskyblue", "black"), 
-       title = "Station",
-       cex = 0.6)
-
-ggplot(raw_daily_Prairie1, aes(x=Date, y=Discharge_cfs)) +
-        geom_line(color = color_mi[1]) +
+p <- ggplot(raw_daily, aes(x=Date, y=Discharge_cfs)) +
+        geom_line(color = color_ca[4]) +
         scale_y_continuous(trans='log10')
 
-
+# Set axis limits c(min, max)
+min <- as.Date("1950-1-1")
+max <- as.Date("2021-12-31")
+p + scale_x_date(limits = c(min, max))
 
 
 
