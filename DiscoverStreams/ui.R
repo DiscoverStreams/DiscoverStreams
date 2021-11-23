@@ -11,11 +11,11 @@ library(shiny)
 library(ggplot2)
 
 # Shiny demo code
-dataset <- diamonds
+dataset <- streamflow_Prairie
 
 fluidPage(
     
-    titlePanel("Diamonds Explorer"),
+    titlePanel("DiscoverStreams"),
     
     sidebarPanel(
         
@@ -24,13 +24,10 @@ fluidPage(
         
         selectInput('x', 'X', names(dataset)),
         selectInput('y', 'Y', names(dataset), names(dataset)[[2]]),
-        selectInput('color', 'Color', c('None', names(dataset))),
+        # selectInput('color', 'Color', c('None', names(dataset))),
         
-        checkboxInput('jitter', 'Jitter'),
-        checkboxInput('smooth', 'Smooth'),
+        checkboxInput('log', 'Log')
         
-        selectInput('facet_row', 'Facet Row', c(None='.', names(dataset))),
-        selectInput('facet_col', 'Facet Column', c(None='.', names(dataset)))
     ),
     
     mainPanel(
