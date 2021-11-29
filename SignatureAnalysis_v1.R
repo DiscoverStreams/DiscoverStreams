@@ -95,17 +95,6 @@ waterUSE_SV_select <- waterUse_SV[ , c(5,243)]
 # 243 	Irrigation..Total.total.consumptive.use..in.Mgal.d
 
 
-waterUse_StJo <- readNWISuse(
-        stateCd = state,
-        countyCd = county,
-        years = "ALL",
-        categories = "ALL",
-        convertType = TRUE,
-        transform = FALSE
-)
-
-waterUSE_StJo_select <- waterUse_StJo[ , c(5,18)]
-
 waterUse_Pr <- readNWISuse(
         stateCd = state,
         countyCd = county,
@@ -115,7 +104,10 @@ waterUse_Pr <- readNWISuse(
         transform = FALSE
 )
 
-waterUSE_Pr_select <- waterUse_Pr[ , c(5,18)]
+waterUSE_Pr_select <- waterUse_Pr[ , c(5,243)]
+
+# Convert units from Mgal/d to cfs
+waterUSE_Pr_select$nwis_irr_cfs <- ((as.numeric(waterUSE_Pr_select$Irrigation..Total.total.consumptive.use..in.Mgal.d)*10^6)/(7.48*86400))
 
 
 
