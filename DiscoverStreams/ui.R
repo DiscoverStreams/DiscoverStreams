@@ -12,6 +12,7 @@ library(ggplot2)
 
 # Shiny demo code
 dataset <- streamflow_Prairie
+dataset2 <- waterUSE_Pr_select
 
 fluidPage(
     
@@ -20,17 +21,23 @@ fluidPage(
     sidebarPanel(
         
         sliderInput('sampleSize', 'Sample Size', min=1, max=nrow(dataset),
-                    value=min(1000, nrow(dataset)), step=1000, round=0),
+                    value=min(1000, nrow(dataset)), step=500, round=0),
         
-        selectInput('x', 'X', names(dataset)),
-        selectInput('y', 'Y', names(dataset), names(dataset)[[2]]),
+        selectInput('x1', 'X - Streamflow', names(dataset)),
+        selectInput('y1', 'Y - Streamflow', names(dataset), names(dataset)[[2]]),
+        
+        checkboxInput('log', 'Log y-axis'),
+        
+        selectInput('x2', 'X - Water Use', names(dataset2)),
+        selectInput('y2', 'Y - Water Use', names(dataset2), names(dataset2)[[2]]),
         # selectInput('color', 'Color', c('None', names(dataset))),
         
-        checkboxInput('log', 'Log')
+        
         
     ),
     
     mainPanel(
-        plotOutput('plot')
+        plotOutput('plot'),
+        plotOutput('plot_wu')
     )
 )

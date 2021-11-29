@@ -18,9 +18,11 @@ function(input, output) {
         streamflow_Prairie[sample(nrow(streamflow_Prairie), input$sampleSize),]
     })
     
+    dataset2 <- reactive(waterUSE_Pr_select)
+    
     output$plot <- renderPlot({
         
-        p <- ggplot(dataset(), aes_string(x=input$x, y=input$y)) + geom_line(color = color_mi[1])
+        p <- ggplot(dataset(), aes_string(x=input$x1, y=input$y1)) + geom_line(color = color_mi[1])
         
         # if (input$color != 'None')
         #     p <- p + aes_string(color=input$color)
@@ -31,6 +33,20 @@ function(input, output) {
         
         print(p)
         
-    }, height=700)
+    })
     
+    output$plot_wu <- renderPlot({
+        
+        p_wu <- ggplot(dataset2(), aes_string(x=input$x2, y=input$y2)) + geom_point(color = color_mi[3])
+        
+        # if (input$color != 'None')
+        #     p <- p + aes_string(color=input$color)
+        
+        
+        # if (input$log)
+        #     p_wu <- p_wu + scale_y_continuous(trans='log10')
+        
+        print(p_wu)
+        
+    })
 }

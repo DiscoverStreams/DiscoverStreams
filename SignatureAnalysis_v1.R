@@ -105,9 +105,10 @@ waterUse_Pr <- readNWISuse(
 )
 
 waterUSE_Pr_select <- waterUse_Pr[ , c(5,243)]
+colnames(waterUSE_Pr_select) <- c("Date", "Irrigation_total_Mgal_d")
 
 # Convert units from Mgal/d to cfs
-waterUSE_Pr_select$nwis_irr_cfs <- ((as.numeric(waterUSE_Pr_select$Irrigation..Total.total.consumptive.use..in.Mgal.d)*10^6)/(7.48*86400))
+waterUSE_Pr_select$Irrigation_total_cfs <- ((as.numeric(waterUSE_Pr_select$`Irrigation_total_Mgal_d`)*10^6)/(7.48*86400))
 
 
 
