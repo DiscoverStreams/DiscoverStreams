@@ -14,39 +14,44 @@ library(ggplot2)
 # Shiny demo code
 function(input, output) {
     
-    dataset <- reactive({
-        streamflow_Prairie[sample(nrow(streamflow_Prairie), input$sampleSize),]
-    })
+    dataset <- reactive(streamflow)
+    dataset2 <- reactive(irrigation)
     
-    dataset2 <- reactive(waterUSE_Pr_select)
-    
-    output$plot <- renderPlot({
+    output$plot1 <- renderPlot({
         
-        p <- ggplot(dataset(), aes_string(x=input$x1, y=input$y1)) + geom_line(color = color_mi[1])
+        p1 <- ggplot(dataset(), aes_string(x="Date", y=input$y1)) + geom_line(color = color_mi[1])
         
         # if (input$color != 'None')
-        #     p <- p + aes_string(color=input$color)
+        #     p1 <- p1 + aes_string(color=input$color)
+        min <- as.Date("1950-1-1")
+        max <- NA
         
+        p1 + scale_x_date(limits = c(min,max))
 
         if (input$log)
-            p <- p + scale_y_continuous(trans='log10')
+            p1 <- p1 + scale_y_continuous(trans='log10')
         
-        print(p)
+        print(p1)
         
     })
     
-    output$plot_wu <- renderPlot({
+    output$plot2 <- renderPlot({
         
-        p_wu <- ggplot(dataset2(), aes_string(x=input$x2, y=input$y2)) + geom_point(color = color_mi[3])
+        p2 <- ggplot(dataset2(), aes_string(x="Date", y=input$y2)) + geom_point(color = color_mi[3])
         
         # if (input$color != 'None')
-        #     p <- p + aes_string(color=input$color)
+        #     p2 <- p2 + aes_string(color=input$color)
         
         
         # if (input$log)
-        #     p_wu <- p_wu + scale_y_continuous(trans='log10')
+        #     p2 <- p2 + scale_y_continuous(trans='log10')
         
-        print(p_wu)
+        min <- as.Date("1950-1-1")
+        max <- NA
+        
+        p2 + scale_x_date(limits = c(min,max))
+        
+        print(p2)
         
     })
 }
