@@ -32,6 +32,7 @@ fluidPage(
         selectInput('y2', 'Y - Water Use', names(dataset2), names(dataset2)[[2]]),
         # selectInput('color', 'Color', c('None', names(dataset))),
         
+        # textOutput('summary1')
         
         
     ),
