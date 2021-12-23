@@ -81,8 +81,8 @@ huc180102CA <- data.frame()
 site_select <- data.frame()
 
 ## CHANGE HUC08 name in for loop then RUN
-for (i in seq_along(huc18010212CA_sites)) {
-        site_number <- huc18010212CA_sites[i]
+for (i in seq_along(huc04050007MI_sites)) {
+        site_number <- huc04050007MI_sites[i]
         site_info <- readNWISsite(site_number)
         # keep columns 2, 3, 7, 8, 24
         site_info <- site_info[ , c(2, 3, 7, 8, 24)]
@@ -100,7 +100,7 @@ for (i in seq_along(huc18010212CA_sites)) {
                         site_info$endDate <- last(as.Date(raw_daily$Date))
                 if (length(raw_daily)!=0)
                         site_info$yearsAvail <- year(site_info$endDate) - year(site_info$startDate)
-                        
+                
         site_select <- rbind(site_select, site_info)
         site_select <- site_select[!duplicated(site_select), ]
         site_select <- subset(site_select, yearsAvail >= 30, select = c(1:8))
@@ -109,60 +109,135 @@ for (i in seq_along(huc18010212CA_sites)) {
         # paste(hucname,"_set") <- data.frame()
         
         ## APPEND HUC08 site selected to corresponding HUC06 data frame, CHOOSE HUC08 by commenting out other HUC06 watersheds
-        # huc040500MI <- rbind(huc040500MI, site_select)
-        # huc040500MI <- huc040500MI[!duplicated(huc040500MI), ]
+        huc040500MI <- rbind(huc040500MI, site_select)
+        huc040500MI <- huc040500MI[!duplicated(huc040500MI), ]
         # huc110300KS <- rbind(huc110300KS, site_select)
         # huc110300KS <- huc110300KS[!duplicated(huc110300KS), ]
-        huc180102CA <- rbind(huc180102CA, site_select)
-        huc180102CA <- huc180102CA[!duplicated(huc180102CA), ]
+        # huc180102CA <- rbind(huc180102CA, site_select)
+        # huc180102CA <- huc180102CA[!duplicated(huc180102CA), ]
         
 }
 
+## CREATE watershed variable to work with and RESET as needed without re-running for loops
+huc040500MI_ws <- huc040500MI
+huc110300KS_ws <- huc110300KS
+huc180102CA_ws <- huc180102CA
+
 ## optional CREATE data frame for corresponding HUC08 from for loop
-huc04050001MI <- site_select
-huc04050002MI <- site_select
-huc04050003MI <- site_select
-huc04050004MI <- site_select
-huc04050005MI <- site_select
-huc04050006MI <- site_select
-huc04050007MI <- site_select
+# huc04050001MI <- site_select
+# huc04050002MI <- site_select
+# huc04050003MI <- site_select
+# huc04050004MI <- site_select
+# huc04050005MI <- site_select
+# huc04050006MI <- site_select
+# huc04050007MI <- site_select
+# 
+# huc11030001KS <- site_select
+# huc11030002KS <- site_select
+# huc11030003KS <- site_select
+# huc11030004KS <- site_select
+# huc11030005KS <- site_select
+# huc11030006KS <- site_select
+# huc11030007KS <- site_select
+# huc11030008KS <- site_select
+# huc11030009KS <- site_select
+# huc11030010KS <- site_select
+# huc11030011KS <- site_select
+# huc11030012KS <- site_select
+# huc11030013KS <- site_select
+# huc11030014KS <- site_select
+# huc11030015KS <- site_select
+# huc11030016KS <- site_select
+# huc11030017KS <- site_select
+# huc11030018KS <- site_select
+# 
+# huc18010201CA <- site_select
+# huc18010202CA <- site_select
+# huc18010203CA <- site_select
+# huc18010204CA <- site_select
+# huc18010205CA <- site_select
+# huc18010206CA <- site_select
+# huc18010207CA <- site_select
+# huc18010208CA <- site_select
+# huc18010209CA <- site_select
+# huc18010210CA <- site_select
+# huc18010211CA <- site_select
+# huc18010212CA <- site_select
 
-huc11030001KS <- site_select
-huc11030002KS <- site_select
-huc11030003KS <- site_select
-huc11030004KS <- site_select
-huc11030005KS <- site_select
-huc11030006KS <- site_select
-huc11030007KS <- site_select
-huc11030008KS <- site_select
-huc11030009KS <- site_select
-huc11030010KS <- site_select
-huc11030011KS <- site_select
-huc11030012KS <- site_select
-huc11030013KS <- site_select
-huc11030014KS <- site_select
-huc11030015KS <- site_select
-huc11030016KS <- site_select
-huc11030017KS <- site_select
-huc11030018KS <- site_select
-
-huc18010201CA <- site_select
-huc18010202CA <- site_select
-huc18010203CA <- site_select
-huc18010204CA <- site_select
-huc18010205CA <- site_select
-huc18010206CA <- site_select
-huc18010207CA <- site_select
-huc18010208CA <- site_select
-huc18010209CA <- site_select
-huc18010210CA <- site_select
-huc18010211CA <- site_select
-huc18010212CA <- site_select
+## WRITE watershed site information to CSV for use with GIS and webGIS
+write.csv(huc040500MI, "~/GradSchool/DiscoverStreams/outputs/huc040500MI.csv")
+write.csv(huc110300KS, "~/GradSchool/DiscoverStreams/outputs/huc110300KS.csv")
+write.csv(huc180102CA, "~/GradSchool/DiscoverStreams/outputs/huc180102CA.csv")
 
 
+## RUN corresponding streamflow dataframe for each HUC06, also set HUC06 in dataframe setup and in for loop
+huc040500MI_sf <- data.frame()
+huc110300KS_sf <- data.frame()
+huc180102CA_sf <- data.frame()
+
+## SETUP streamflow dataframe with data from i=1 
+site_number <- huc040500MI_ws$site_no[i=1]
+        raw_daily <- readNWISdv(site_number, parameter_code, start_date, end_date)
+        raw_daily <- drop_columns(raw_daily, c("site_no", "agency_cd", "X_00060_00003_cd"))
+        colnames(raw_daily) <- c("Date", huc040500MI_ws$station_nm[i=1])
+        huc040500MI_sf <- raw_daily
+
+
+## CHANGE HUC08 name in for loop then RUN
+for (i in seq_along(huc040500MI_ws$site_no)) {
+        site_number <- huc040500MI_ws$site_no[i]
+        raw_daily <- readNWISdv(site_number, parameter_code, start_date, end_date)
+        raw_daily <- drop_columns(raw_daily, c("site_no", "agency_cd", "X_00060_00003_cd"))
+        colnames(raw_daily) <- c("Date", huc040500MI_ws$station_nm[i])
+      
+        ## APPEND streamflow data for site selected to corresponding HUC06 streamflow data frame, CHOOSE HUC08 by commenting out other HUC06 watersheds
+        huc040500MI_sf <- full_join(huc040500MI_sf, raw_daily, by = "Date")
+        huc040500MI_sf <- huc040500MI_sf[!duplicated(as.list(huc040500MI_sf))]
+        # huc110300KS_sf <- full_join(huc110300KS_sf, raw_daily, by = "Date")
+        # huc110300KS_sf <- huc110300KS_sf[!duplicated(as.list(huc110300KS_sf))]
+        # huc180102CA_sf <- full_join(huc180102CA_sf, raw_daily, by = "Date")
+        # huc180102CA_sf <- huc180102CA_sf[!duplicated(as.list(huc180102CA_sf))]
+        
+}
+
+
+### DATA EXPLORER ###
+# CREATE summary stats report for watersheds and streamflow sets
+create_report(huc040500MI, output_file = "huc04050001MI_report.html", output_dir = oname, report_title = "04050001 - Michigan - Data Profiling Report")
+create_report(huc110300KS, output_file = "huc110300KS_report.html", output_dir = oname, report_title = "110300 - Kansas - Data Profiling Report")
+create_report(huc180102CA, output_file = "huc180102CA_report.html", output_dir = oname, report_title = "180102 - California - Data Profiling Report")
+
+# DataExplorer report did not work for streamflow dataframes
+create_report(huc040500MI_sf, output_file = "huc04050001MIsf_report.html", output_dir = oname, report_title = "04050001 Streamflow- Michigan - Data Profiling Report")
+create_report(huc110300KS_sf, output_file = "huc110300KSsf_report.html", output_dir = oname, report_title = "110300 Streamflow - Kansas - Data Profiling Report")
+create_report(huc180102CA_sf, output_file = "huc180102CAsf_report.html", output_dir = oname, report_title = "180102 Streamflow - California - Data Profiling Report")
+
+print(summary(huc040500MI_sf))
 
 
 
+### CALCULATE STATS ###
+## CLEAR data frame before running for loop
+sf_7day_mean_min <- data.frame()
+
+## CALCULATE 7-day moving average then take min as 7-day low flow metric for each gage station in watershed using zoo package
+for (i in seq_along(huc040500MI_ws$site_no)) {
+        site_number <- huc040500MI_ws$site_no[i]
+        raw_daily <- readNWISdv(site_number, parameter_code, start_date, end_date)
+        raw_daily <- drop_columns(raw_daily, c("site_no", "Date", "agency_cd", "X_00060_00003_cd"))
+        
+        sf <- as.zoo(raw_daily)
+        sf_7day_mean <- rollmean(sf, 7)
+        sf_7day_mean <- round(sf_7day_mean, 3)
+        sf_7day_mean_min <- rbind(sf_7day_mean_min, min(sf_7day_mean))
+        colnames(sf_7day_mean_min) <- "LF7day"
+        
+}
+
+## APPEND min of 7-day moving average to huc 6 dataframe
+huc040500MI_ws <- cbind(huc040500MI_ws, sf_7day_mean_min)
+huc110300KS_ws <- cbind(huc110300KS_ws, sf_7day_mean_min)
+huc180102CA_ws <- cbind(huc180102CA_ws, sf_7day_mean_min)
 
 
 
@@ -177,11 +252,8 @@ sites_mi <- c("04097540", "040975253", "04097526", "04097528", "040975296", "040
 color_mi <- c("deepskyblue", "cadetblue2", "deepskyblue4") 
 ## #01bfff, #8ee5ee, #01688b
 
-### STREAMFLOW (NWIS) - KANSAS ###
 
-
-
-### RETRIEVE STREAMFLOW DATA FROM NWIS ###
+### RETRIEVE STREAMFLOW DATA FROM NWIS FOR SINGLE GAGE STATION ###
 # SELECT site, then retrieve data
 site_number <- "11519500" ## Scott R
 site_number <- "04097540" ## Prairie R
@@ -192,7 +264,9 @@ raw_daily <- readNWISdv(site_number, parameter_code, start_date, end_date)
 raw_daily <- drop_columns(raw_daily, c("site_no", "agency_cd", "X_00060_00003_cd"))
 
 # REFORMAT data - Scott River, CA
-colnames(raw_daily) <- c("Date", "Scott_Discharge_cfs")
+colnames(raw_daily) <- c("Date", "Discharge_cfs")
+raw_daily$Discharge_cfs <- as.numeric(raw_daily$Discharge_cfs)
+# raw_daily <- addWaterYear(raw_daily)
 streamflow_SR <- raw_daily
 
 # REFORMAT data - Prairie River, MI
@@ -201,7 +275,6 @@ streamflow_PR <- raw_daily
 
 # COMBINE sites into dataframe
 streamflow <- left_join(streamflow_SR, streamflow_PR, by = "Date") 
-
 
 
 ### PLOT ###
@@ -278,14 +351,8 @@ irrigation <- left_join(waterUSE_SV_select, waterUSE_Pr_select, by = "Date")
 
 ### LFSTAT ###
 ### PREPARE data - needs timestamp broken into columns for day, month, year, flow
-lf_SR <- separate(streamflow_SR, "Date", c("year", "month", "day"), "-")
-colnames(lf_SR) <- c("year","month", "day", "flow")
-lf_SR <- createlfobj(lf_SR)
-
-lf_PR <- separate(streamflow_PR, "Date", c("year", "month", "day"), "-")
-colnames(lf_PR) <- c("year","month", "day", "flow")
-lf_PR <- createlfobj(lf_PR)
-
+sf <- separate(streamflow_SR, "Date", c("year", "month", "day"), "-")
+colnames(sf) <- c("year","month", "day", "waterYear", "flow")
 
 # CALCULATE low flow statistics for daily stream flow data
 lfstats <- multistationsreport(lf_PR, lf_SR, indices = c("meanflow", "Q95", "MAM1", "MAM7", 
