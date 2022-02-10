@@ -10,8 +10,11 @@
 library(shiny)
 library(rsconnect)
 library(ggplot2)
+library(dataRetrieval)
 
-# Shiny demo code
+
+
+### SHINY APP ###
 function(input, output) {
     
     dataset <- reactive(streamflow)

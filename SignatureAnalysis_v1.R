@@ -215,17 +215,38 @@ create_report(huc180102CA_sf, output_file = "huc180102CAsf_report.html", output_
 print(summary(huc040500MI_sf))
 
 
-
+### GET STATION INFO ###
+for (i in seq_along(huc040500MI_ws$site_no)) {
+  site_number <- huc040500MI_ws$site_no[i]
+  site_info <- readNWISsite(site_number)
+  site_name <- site_info$station_nm
+  station_names <- rbind(site_name)
+}
+station_names <- as.list(station_names)
+  
 ### CALCULATE STATS ###
 ## CLEAR data frame before running for loop
 sf_7day_mean_min <- data.frame()
+sf_annual_mean <- data.frame()
 
-## CALCULATE 7-day moving average then take min as 7-day low flow metric for each gage station in watershed using zoo package
+
 for (i in seq_along(huc040500MI_ws$site_no)) {
-        site_number <- huc040500MI_ws$site_no[i]
-        raw_daily <- readNWISdv(site_number, parameter_code, start_date, end_date)
-        raw_daily <- drop_columns(raw_daily, c("site_no", "Date", "agency_cd", "X_00060_00003_cd"))
+        site_number <- huc180102CA_ws$site_no[16]
+        site_info <- readNWISsite(site_number)
+        site_name <- site_info$station_nm
         
+        raw_daily <- readNWISdv(site_number, parameter_code, start_date, end_date) 
+        raw_daily <- drop_columns(raw_daily, c("site_no", "agency_cd", "X_00060_00003_cd"))
+        raw_daily$Year <- as.numeric(format(raw_daily$Date, "%Y"))
+        # sf_annual_mean <- aggregate(raw_daily[c(2,3)], df["Year"], mean, na.rm = TRUE)
+        annual_mean <- raw_daily %>% 
+                       group_by(Year) %>% 
+                       summarize(MeanDischarge = mean(X_00060_00003))
+        
+        annual_mean <- subset(annual_mean, Year >= "1960")
+        sf_annual_mean <- left_join(sf_annual_mean, annual_mean, by = "Year",  set_names = site_name)
+        
+        ## CALCULATE 7-day moving average then take min as 7-day low flow metric for each gage station in watershed using           Zoo package
         sf <- as.zoo(raw_daily)
         sf_7day_mean <- rollmean(sf, 7)
         sf_7day_mean <- round(sf_7day_mean, 3)
@@ -234,13 +255,15 @@ for (i in seq_along(huc040500MI_ws$site_no)) {
         
 }
 
+
 ## APPEND min of 7-day moving average to huc 6 dataframe
 huc040500MI_ws <- cbind(huc040500MI_ws, sf_7day_mean_min)
 huc110300KS_ws <- cbind(huc110300KS_ws, sf_7day_mean_min)
 huc180102CA_ws <- cbind(huc180102CA_ws, sf_7day_mean_min)
 
-
-
+huc040500MI_ws <- drop_columns(huc040500MI_ws, c("dec_lat_va", "dec_long_va"))
+huc110300KS_ws <- drop_columns(huc110300KS_ws, c("dec_lat_va", "dec_long_va"))
+huc180102CA_ws <- drop_columns(huc180102CA_ws, c("dec_lat_va", "dec_long_va"))
 
 ### STREAMFLOW (NWIS) - SCOTT VALLEY, CALIFORNIA ###
 sites_ca <- c("11519500", "11519000", "11518200", "11518050")
@@ -264,8 +287,8 @@ raw_daily <- readNWISdv(site_number, parameter_code, start_date, end_date)
 raw_daily <- drop_columns(raw_daily, c("site_no", "agency_cd", "X_00060_00003_cd"))
 
 # REFORMAT data - Scott River, CA
-colnames(raw_daily) <- c("Date", "Discharge_cfs")
-raw_daily$Discharge_cfs <- as.numeric(raw_daily$Discharge_cfs)
+colnames(raw_daily) <- c("Date", "Scott_Discharge_cfs")
+raw_daily$Scott_Discharge_cfs <- as.numeric(raw_daily$Scott_Discharge_cfs)
 # raw_daily <- addWaterYear(raw_daily)
 streamflow_SR <- raw_daily
 
@@ -279,20 +302,25 @@ streamflow <- left_join(streamflow_SR, streamflow_PR, by = "Date")
 
 ### PLOT ###
 
-p <- ggplot(raw_daily, aes(x=Date, y=Discharge_cfs)) +
-        geom_line(color = color_ca[4]) +
-        scale_y_continuous(trans='log10')
+p <- ggplot(annual_mean, aes(x = Year, y = MeanDischarge)) +
+     geom_point(shape = 21, color = "black", fill = "chartreuse3", size = 4) +
+     geom_line() +
+     ggtitle("Scott River near Fort Jones - Annual Mean Discharge")
+
+# + scale_y_continuous(trans='log10')
 
 # Set axis limits c(min, max)
-min <- as.Date("1950-1-1")
-max <- as.Date("2021-12-31")
-p + scale_x_date(limits = c(min, max))
+# min <- as.Date("1950-1-1")
+# max <- as.Date("2021-12-31")
+# p + scale_x_date(limits = c(min, max))
+# p + scale_x_discrete(breaks = c("1960", "1965", "1970", "1975", "1980", "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020", "2025"))
+
+p
 
 
 
 
-
-### WATER USE (NWIS) ###
+ ### WATER USE (NWIS) ###
 ## SELECT site, then retrieve data
 site_number <- "11519500" ## Scott River
 site_number <- "04097540" ## Prairie River - St. Joseph County
@@ -373,51 +401,3 @@ PrairieStats <- low.spells(streamflow_PR, quant = 0.1, threshold=NULL,
 
 ### STREAMDEPLETR ###
 ## need aquifer parameters
-
-########
-# qColNames = c("Year", "Month", "Discharge")
-# 
-# q_select <- streamflow_monthly_syracuse[-(1) , c(5:7)] %>% 
-#   filter(year_nu > 1949)
-# colnames(q_select) = qColNames
-# 
-# data_join <- left_join(CSVtoJSON, q_select)
-# 
-# q_syracuse <- data_join
-# write.csv(q_syracuse, "~/GradSchool/Data/Streamflow_Monthly_NWIS/20200915/Syracuse_Qmo.csv", row.names = FALSE, na = "null")
-# 
-# q_select <- streamflow_monthly_gardencity[-(1) , c(5:7)] %>% 
-#   filter(year_nu > 1949)
-# colnames(q_select) = qColNames
-# 
-# data_join <- left_join(CSVtoJSON, q_select)
-# 
-# q_gardencity <- data_join
-# write.csv(q_gardencity, "~/GradSchool/Data/Streamflow_Monthly_NWIS/20200915/GardenCity_Qmo.csv", row.names = FALSE, na = "null")
-# 
-# q_select <- streamflow_monthly_dodgecity[-(1) , c(5:7)] %>% 
-#   filter(year_nu > 1949)
-# colnames(q_select) = qColNames
-# 
-# data_join <- left_join(CSVtoJSON, q_select)
-# 
-# q_dodgecity <- data_join
-# write.csv(q_dodgecity, "~/GradSchool/Data/Streamflow_Monthly_NWIS/20200915/DodgeCity_Qmo.csv", row.names = FALSE, na = "null")
-# 
-# q_select <- streamflow_monthly_greatbend[-(1) , c(5:7)] %>% 
-#   filter(year_nu > 1949)
-# colnames(q_select) = qColNames
-# 
-# data_join <- left_join(CSVtoJSON, q_select)
-# 
-# q_greatbend <- data_join
-# write.csv(q_greatbend, "~/GradSchool/Data/Streamflow_Monthly_NWIS/20200915/GreatBend_Qmo.csv", row.names = FALSE, na = "null")
-# 
-# q_select <- streamflow_monthly_wichita[-(1) , c(5:7)] %>% 
-#   filter(year_nu > 1949)
-# colnames(q_select) = qColNames
-# 
-# data_join <- left_join(CSVtoJSON, q_select)
-# 
-# q_wichita <- data_join
-# write.csv(q_wichita, "~/GradSchool/Data/Streamflow_Monthly_NWIS/20200915/Wichita_Qmo.csv", row.names = FALSE, na = "null")
