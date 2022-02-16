@@ -5,9 +5,18 @@ library(tidyverse)
 library(DataExplorer)
 library(dplyr)
 library(jsonlite)
+library(odbc)
 
 library(dataRetrieval)
 
+## CONNECT to SQL database on UWaterloo server
+con <- dbConnect(odbc(),
+                 Driver = "SQL Server",
+                 Server = "interactiveviz.uwaterloo.ca",
+                 Database = "interact_water",
+                 UID = "webconnect",
+                 PWD = "F-9hZ#Q8G}c{",
+                 Port = 3306)
 
 setwd("~/GradSchool/DiscoverStreams")
 wname <- getwd() # set back to working directory
@@ -26,6 +35,7 @@ color_mi <- c("deepskyblue", "cadetblue2", "deepskyblue4")
 ## #01bfff, #8ee5ee, #01688b
 
 ### STREAMFLOW (NWIS) - KANSAS ###
+
 
 
 
