@@ -191,7 +191,7 @@ for (i in seq_along(huc180102CA_ws$site_no)) {
     # huc180102CA_wu <- huc180102CA_wu[!duplicated(as.list(huc180102CA_wu))]
 }
 
-  
+######################################################  
 ### CLIMATE (NOAA) ###
 ## RUN corresponding streamflow dataframe for each HUC06, also set HUC06 in dataframe setup and in for loop
 huc040500MI_cl <- data.frame()
@@ -208,65 +208,15 @@ MI_8 <- data.frame(name = huc040500MI_ws[8,2], lat = huc040500MI_ws[8,3], lon = 
 MI_meteo_stations <- rnoaa::meteo_nearby_stations(MI_8, lat_colname = "lat", lon_colname = "lon", station_data = ghcnd_stations())
 
 
-############################################
-### ST. JOSEPH WATERSHED ###
-PRAIRIE_RIVER_NR_NOTTAWA_MI <- data.frame()
 
-sf <- huc040500MI_sf[ , c(1,9)] 
-
-sf$Year <- as.numeric(format(sf$Date, "%Y"))
-  
-  sf %>% 
-    group_by(Year) %>% 
-    summarize(MeanDischarge = mean(sf$`PRAIRIE RIVER NEAR NOTTAWA, MI`))
-  
-  annual_mean <- subset(annual_mean, Year >= "1960")
-  sf_annual_mean <- left_join(sf_annual_mean, annual_mean, by = "Year",  set_names = site_name)
-  
-  ## CALCULATE 7-day moving average then take min as 7-day low flow metric for each gage station in watershed using           Zoo package
-  sf <- as.zoo(raw_daily)
-  sf_7day_mean <- rollmean(sf, 7)
-  sf_7day_mean <- round(sf_7day_mean, 3)
-  sf_7day_mean_min <- rbind(sf_7day_mean_min, min(sf_7day_mean))
-  colnames(sf_7day_mean_min) <- "LF7day"
-
-
-
-
-
-
-
-
-
-
-
-##############################################
-### DATA EXPLORER ###
-# CREATE summary stats report for watersheds and streamflow sets
-create_report(huc040500MI, output_file = "huc04050001MI_report.html", output_dir = oname, report_title = "04050001 - Michigan - Data Profiling Report")
-create_report(huc110300KS, output_file = "huc110300KS_report.html", output_dir = oname, report_title = "110300 - Kansas - Data Profiling Report")
-create_report(huc180102CA, output_file = "huc180102CA_report.html", output_dir = oname, report_title = "180102 - California - Data Profiling Report")
-
-# DataExplorer report did not work for streamflow dataframes
-create_report(huc040500MI_sf, output_file = "huc04050001MIsf_report.html", output_dir = oname, report_title = "04050001 Streamflow- Michigan - Data Profiling Report")
-create_report(huc110300KS_sf, output_file = "huc110300KSsf_report.html", output_dir = oname, report_title = "110300 Streamflow - Kansas - Data Profiling Report")
-create_report(huc180102CA_sf, output_file = "huc180102CAsf_report.html", output_dir = oname, report_title = "180102 Streamflow - California - Data Profiling Report")
-
-print(summary(huc040500MI_sf))
-summary_huc040500MI_sf <- summary(huc040500MI_sf)
-view(summary_huc040500MI_sf)
-
-
- 
-
- 
+########################################################################
 ### CALCULATE STATS ###
 ## CLEAR data frame before running for loop
-PRAIRIE_RIVER_NR_NOTTAWA_MI <- data.frame()
-as.character(paste("MI_", i, sep = "")) <- data.frame()
+# PRAIRIE_RIVER_NR_NOTTAWA_MI <- data.frame()
+# as.character(paste("MI_", i, sep = "")) <- data.frame()
 
 for (i in seq_along(huc040500MI_ws$site_no)) {
-        site_number <- huc040500MI_ws$site_no[8]
+        site_number <- huc040500MI_ws$site_no[i=10]
         site_info <- dataRetrieval::readNWISsite(site_number)
         site_name <- site_info$station_nm
         
@@ -279,39 +229,39 @@ for (i in seq_along(huc040500MI_ws$site_no)) {
                        group_by(Year) %>% 
                        summarize(MeanDischarge = mean(X_00060_00003))
         
-        PRAIRIE_RIVER_NR_NOTTAWA_MI <- annual_mean
+        station_data <- annual_mean
         
         ## CALCULATE Q10 - 10th percentile of flow
         Q10 <- raw_daily %>% 
           group_by(Year) %>% 
           summarize(Q10 = quantile(X_00060_00003, probs = 0.1, na.rm = TRUE))
         
-        PRAIRIE_RIVER_NR_NOTTAWA_MI <- left_join(PRAIRIE_RIVER_NR_NOTTAWA_MI, Q10, by = "Year")
+        station_data <- left_join(station_data, Q10, by = "Year")
         
         ## CALCULATE Q50 - 50th percentile of flow
         Q50 <- raw_daily %>% 
                group_by(Year) %>% 
                summarize(Q50 = quantile(X_00060_00003, probs = 0.5, na.rm = TRUE))
         
-        PRAIRIE_RIVER_NR_NOTTAWA_MI <- left_join(PRAIRIE_RIVER_NR_NOTTAWA_MI, Q50, by = "Year")
+        station_data <- left_join(station_data, Q50, by = "Year")
         
         ## CALCULATE Q90 - 90th percentile of flow 
         Q90 <- raw_daily %>% 
           group_by(Year) %>% 
           summarize(Q90 = quantile(X_00060_00003, probs = 0.9, na.rm = TRUE))
         
-        PRAIRIE_RIVER_NR_NOTTAWA_MI <- left_join(PRAIRIE_RIVER_NR_NOTTAWA_MI, Q90, by = "Year")
+        station_data <- left_join(station_data, Q90, by = "Year")
         
         
-        ## PREPARE data - needs timestamp broken into columns for day, month, year, flow
+        ## PREPARE data for use with lfstat - needs timestamp broken into columns for day, month, year, flow
         sf <- separate(raw_daily, "Date", c("year", "month", "day"), "-")
-        colnames(sf) <- c("year","mont
-                          h", "day", "flow", "water year")
+        colnames(sf) <- c("year","month", "day", "flow", "water year")
         sf <- lfstat::createlfobj(sf)
-        ## CALCULATE MAM7 - Mean Annual Minimum for every 7 days
+        
+        ## CALCULATE MAM7 - Mean Annual Minimum over 7 period -> 7-day low flow
         MAM7 <- lfstat::MAM(sf, n=7, year = "any", breakdays = NULL, yearly = TRUE)
         colnames(MAM7) <- c("Year","MAM7")
-        PRAIRIE_RIVER_NR_NOTTAWA_MI <- left_join(PRAIRIE_RIVER_NR_NOTTAWA_MI, MAM7, by = "Year")
+        station_data <- left_join(station_data, MAM7, by = "Year")
         
         ## CALCULATE Annual Mean Baseflow - Average baseflow for each year
         annual_mean_baseflow <- sf %>% 
@@ -319,16 +269,16 @@ for (i in seq_along(huc040500MI_ws$site_no)) {
           summarize(MeanBaseflow = mean(baseflow))
         colnames(annual_mean_baseflow) <- c("Year", "MeanBaseflow")
         annual_mean_baseflow$Year <- as.double(annual_mean_baseflow$Year)
-        PRAIRIE_RIVER_NR_NOTTAWA_MI <- left_join(PRAIRIE_RIVER_NR_NOTTAWA_MI, annual_mean_baseflow, by = "Year")
+        station_data <- left_join(station_data, annual_mean_baseflow, by = "Year")
         
         ## CALCULATE BFI - Baseflow Index for each year
-        BFI <- lfstat::BFI(sf, year = "any", breakdays = NULL, yearly = TRUE)
-        BFI <- data.frame(PRAIRIE_RIVER_NR_NOTTAWA_MI$Year, BFI)
-        colnames(BFI) <- c("Year", "BFI") 
-        PRAIRIE_RIVER_NR_NOTTAWA_MI <- left_join(PRAIRIE_RIVER_NR_NOTTAWA_MI, BFI, by = "Year")
+        # BFI <- lfstat::BFI(sf, year = "any", breakdays = NULL, yearly = TRUE)
+        # BFI <- data.frame(station_data$Year, BFI)
+        # colnames(BFI) <- c("Year", "BFI") 
+        # station_data <- left_join(station_data, BFI, by = "Year")
         
         ## PLOT resulting metrics for streamgage station
-        data_melt <- reshape2::melt(PRAIRIE_RIVER_NR_NOTTAWA_MI, measure.vars = 2:8, variable.name = "Metric", value.name = "Discharge")
+        data_melt <- reshape2::melt(station_data, measure.vars = 2:8, variable.name = "Metric", value.name = "Discharge")
         
         p_metrics <- ggplot2::ggplot(data_melt, aes(x = Year, y = Discharge, color = Metric, linetype = Metric, size = Metric)) +
                      geom_line() +
@@ -340,8 +290,9 @@ for (i in seq_along(huc040500MI_ws$site_no)) {
                      ylab("Discharge ft^3/s") 
         
         ## SAVE plot
-        png(file = paste(pname, "/MI_", i = 8, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px", res = 200)
+        png(file = paste(pname, "/MI_metrics/MI_", i=10, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px", res = 200)
         p_metrics
+        Sys.sleep(5)
         dev.off()
 }
         
@@ -365,7 +316,28 @@ p
 
 ###########################################################
 ###########################################################
+### DATA EXPLORER ###
+# CREATE summary stats report for watersheds and streamflow sets
+create_report(huc040500MI, output_file = "huc04050001MI_report.html", output_dir = oname, report_title = "04050001 - Michigan - Data Profiling Report")
+create_report(huc110300KS, output_file = "huc110300KS_report.html", output_dir = oname, report_title = "110300 - Kansas - Data Profiling Report")
+create_report(huc180102CA, output_file = "huc180102CA_report.html", output_dir = oname, report_title = "180102 - California - Data Profiling Report")
 
+# DataExplorer report did not work for streamflow dataframes
+create_report(huc040500MI_sf, output_file = "huc04050001MIsf_report.html", output_dir = oname, report_title = "04050001 Streamflow- Michigan - Data Profiling Report")
+create_report(huc110300KS_sf, output_file = "huc110300KSsf_report.html", output_dir = oname, report_title = "110300 Streamflow - Kansas - Data Profiling Report")
+create_report(huc180102CA_sf, output_file = "huc180102CAsf_report.html", output_dir = oname, report_title = "180102 Streamflow - California - Data Profiling Report")
+
+print(summary(huc040500MI_sf))
+summary_huc040500MI_sf <- summary(huc040500MI_sf)
+view(summary_huc040500MI_sf)
+
+### ZOO ###
+## CALCULATE 7-day moving average then take min as 7-day low flow metric for each gage station in watershed using           Zoo package
+sf <- as.zoo(raw_daily)
+sf_7day_mean <- rollmean(sf, 7)
+sf_7day_mean <- round(sf_7day_mean, 3)
+sf_7day_mean_min <- rbind(sf_7day_mean_min, min(sf_7day_mean))
+colnames(sf_7day_mean_min) <- "LF7day"
 
 
 ### LFSTAT ###
