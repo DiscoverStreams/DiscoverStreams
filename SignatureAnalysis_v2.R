@@ -1,21 +1,16 @@
+# data manipulation libraries
 library(tidyverse)
 library(lubridate)
 library(ggplot2)
 library(ggthemes)
 library(reshape2)
-
+# database connection/retrieval libraries
+library(readr)
 library(dataRetrieval)
 library(rnoaa)
-
+# data analysis/statistical libraries
 library(xts)
 library(lfstat)
-
-
-setwd("~/GradSchool/DiscoverStreams")
-wname <- getwd() # set back to working directory
-dname <- paste(wname,"data",sep="/") # will open data file in workikng directory
-oname <- paste(wname,"outputs",sep="/") # will open outputs file in workikng directory
-pname<-paste(wname,"plots",sep="/") # will open plots file in workikng directory
 
 
 # Run once, no need to change parameters for NWIS streamflow data retrieval from NWIS
@@ -88,11 +83,16 @@ huc040500MI_ws <- huc040500MI
 huc110300KS_ws <- huc110300KS
 huc180102CA_ws <- huc180102CA
 
+## ADD column id for indexing
+huc040500MI_ws$id <- 1:nrow(huc040500MI_ws)
+huc110300KS_ws$id <- 1:nrow(huc110300KS_ws)
+huc180102CA_ws$id <- 1:nrow(huc180102CA_ws)
+
 
 ## optional WRITE watershed site information to CSV for use with GIS and webGIS
-write.csv(huc040500MI, "~/GradSchool/DiscoverStreams/outputs/huc040500MI.csv")
-write.csv(huc110300KS, "~/GradSchool/DiscoverStreams/outputs/huc110300KS.csv")
-write.csv(huc180102CA, "~/GradSchool/DiscoverStreams/outputs/huc180102CA.csv")
+write.csv(huc040500MI, "~/GradSchool/DiscoverStreams/outputs/watershed_info/huc040500MI.csv")
+write.csv(huc110300KS, "~/GradSchool/DiscoverStreams/outputs/watershed_info/huc110300KS.csv")
+write.csv(huc180102CA, "~/GradSchool/DiscoverStreams/outputs/watershed_info/huc180102CA.csv")
 
 
 
@@ -215,12 +215,17 @@ MI_meteo_stations <- rnoaa::meteo_nearby_stations(MI_8, lat_colname = "lat", lon
 # PRAIRIE_RIVER_NR_NOTTAWA_MI <- data.frame()
 # as.character(paste("MI_", i, sep = "")) <- data.frame()
 
-for (i in seq_along(huc040500MI_ws$site_no)) {
-        site_number <- huc040500MI_ws$site_no[i=10]
+for (i in huc040500MI_ws$id) {
+  print(i)
+}
+
+
+for (i in 1:3) {
+        site_number <- huc040500MI_ws$site_no[i]
         site_info <- dataRetrieval::readNWISsite(site_number)
         site_name <- site_info$station_nm
         
-        raw_daily <- dataRetrieval::readNWISdv(site_number, parameter_code, start_date, end_date) 
+        raw_daily <- dataRetrieval::readNWISdv(site_number, parameter_code, start_date, end_date)
         raw_daily <- subset(raw_daily, select = c(3,4))
         raw_daily$Year <- as.numeric(format(raw_daily$Date, "%Y"))
         
@@ -229,28 +234,28 @@ for (i in seq_along(huc040500MI_ws$site_no)) {
                        group_by(Year) %>% 
                        summarize(MeanDischarge = mean(X_00060_00003))
         
-        station_data <- annual_mean
+        sf_metrics <- annual_mean
         
         ## CALCULATE Q10 - 10th percentile of flow
         Q10 <- raw_daily %>% 
           group_by(Year) %>% 
           summarize(Q10 = quantile(X_00060_00003, probs = 0.1, na.rm = TRUE))
         
-        station_data <- left_join(station_data, Q10, by = "Year")
+        sf_metrics <- left_join(sf_metrics, Q10, by = "Year")
         
         ## CALCULATE Q50 - 50th percentile of flow
         Q50 <- raw_daily %>% 
                group_by(Year) %>% 
                summarize(Q50 = quantile(X_00060_00003, probs = 0.5, na.rm = TRUE))
         
-        station_data <- left_join(station_data, Q50, by = "Year")
+        sf_metrics <- left_join(sf_metrics, Q50, by = "Year")
         
         ## CALCULATE Q90 - 90th percentile of flow 
         Q90 <- raw_daily %>% 
           group_by(Year) %>% 
           summarize(Q90 = quantile(X_00060_00003, probs = 0.9, na.rm = TRUE))
         
-        station_data <- left_join(station_data, Q90, by = "Year")
+        sf_metrics <- left_join(sf_metrics, Q90, by = "Year")
         
         
         ## PREPARE data for use with lfstat - needs timestamp broken into columns for day, month, year, flow
@@ -261,7 +266,7 @@ for (i in seq_along(huc040500MI_ws$site_no)) {
         ## CALCULATE MAM7 - Mean Annual Minimum over 7 period -> 7-day low flow
         MAM7 <- lfstat::MAM(sf, n=7, year = "any", breakdays = NULL, yearly = TRUE)
         colnames(MAM7) <- c("Year","MAM7")
-        station_data <- left_join(station_data, MAM7, by = "Year")
+        sf_metrics <- left_join(sf_metrics, MAM7, by = "Year")
         
         ## CALCULATE Annual Mean Baseflow - Average baseflow for each year
         annual_mean_baseflow <- sf %>% 
@@ -269,31 +274,35 @@ for (i in seq_along(huc040500MI_ws$site_no)) {
           summarize(MeanBaseflow = mean(baseflow))
         colnames(annual_mean_baseflow) <- c("Year", "MeanBaseflow")
         annual_mean_baseflow$Year <- as.double(annual_mean_baseflow$Year)
-        station_data <- left_join(station_data, annual_mean_baseflow, by = "Year")
+        sf_metrics <- left_join(sf_metrics, annual_mean_baseflow, by = "Year")
         
         ## CALCULATE BFI - Baseflow Index for each year
         # BFI <- lfstat::BFI(sf, year = "any", breakdays = NULL, yearly = TRUE)
-        # BFI <- data.frame(station_data$Year, BFI)
+        # BFI <- data.frame(sf_metrics$Year, BFI)
         # colnames(BFI) <- c("Year", "BFI") 
-        # station_data <- left_join(station_data, BFI, by = "Year")
+        # sf_metrics <- left_join(sf_metrics, BFI, by = "Year")
         
-        ## PLOT resulting metrics for streamgage station
-        data_melt <- reshape2::melt(station_data, measure.vars = 2:8, variable.name = "Metric", value.name = "Discharge")
+        ## PREPARE resulting metrics for plotting
+        data_melt <- reshape2::melt(sf_metrics, measure.vars = 2:7, variable.name = "Metric", value.name = "Discharge")
         
-        p_metrics <- ggplot2::ggplot(data_melt, aes(x = Year, y = Discharge, color = Metric, linetype = Metric, size = Metric)) +
+        ## SAVE plot of streamgage metrics
+        png(file = paste("~/GradSchool/DiscoverStreams/plots/MI_metrics/MI_", i=3, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px", res = 200)
+        
+        ggplot2::ggplot(data_melt, aes(x = Year, y = Discharge, color = Metric, linetype = Metric, size = Metric)) +
                      geom_line() +
                      scale_color_manual(values = c("royalblue4", "hotpink4", "mediumvioletred", "maroon1", "darkgoldenrod2", "deepskyblue3", "black")) +
-                     scale_linetype_manual(values = c(1, 5, 5, 5, 1, 1, 0)) +
+                     scale_linetype_manual(values = c(1, 1, 1, 1, 1, 1, 0)) +
                      scale_size_manual(values = c(1.3, 1.05, 1.05, 1.05, 1.3, 1.5, 0)) +
                      scale_y_log10() +
                      ggtitle(paste(site_name, " METRICS")) +
                      ylab("Discharge ft^3/s") 
+        # p_metrics
         
-        ## SAVE plot
-        png(file = paste(pname, "/MI_metrics/MI_", i=10, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px", res = 200)
-        p_metrics
-        Sys.sleep(5)
+        # Sys.sleep(5)
         dev.off()
+        
+        ## SAVE CSV of streamgage metrics
+        write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_MI/MI_", i, "_metrics.csv"))
 }
         
 ###########################################################
