@@ -9,6 +9,8 @@ library(odbc)
 
 library(dataRetrieval)
 
+library(odbc)
+
 ## CONNECT to SQL database on UWaterloo server
 con <- dbConnect(odbc(),
                  Driver = "SQL Server",
