@@ -3,14 +3,9 @@ library(tidyverse)
 library(lubridate)
 library(reshape2)
 library(ggplot2)
-# database connection/retrieval libraries
+# data retrieval libraries
 library(dataRetrieval)
 
-## Run once, no need to change parameters for NWIS streamflow data retrieval from NWIS
-parameter_code <- c("00060")
-parameter_names <- c("Discharge, cubic feet per second")
-start_date <- ""
-end_date <- ""
 
 ## CREATE streamflow object to work with and RESET as needed without re-running for loops
 sf040500MI <- huc040500MI_sf
@@ -46,9 +41,10 @@ ggplot(sf_count, aes(x = Date, y = Percent, color = Watershed)) +
   geom_point() +
   scale_color_manual(values = c("plum4", "tan3", "springgreen4")) +
   scale_x_date(date_breaks = "10 years", date_labels = "%Y") +
-  ylab("Percent of Stations in Watershed with Data")
+  ylab("Percent of Stations in Watershed with Data") +
+  geom_vline(xintercept = as.Date("1951-10-01"), color = "black")
 
-##############################################
+###############################################################################
 
 ## CREATE dataframe for percent of days with data
 percentDataMI <- data.frame()
@@ -56,15 +52,17 @@ percentDataKS <- data.frame()
 percentDataCA <- data.frame()
 # percentData_all <- data.frame()
 
+## RUN code within for loop for i = 1, then run for loop for i >= 2 
 i = 1
-# for (i in 2:nrow(huc040500MI_ws)) {
+
+## CHOOSE watershed before running for loop
+for (i in 2:nrow(huc040500MI_ws)) {
+  site_number <- huc040500MI_ws$site_no[i]
 # for (i in 2:nrow(huc110300KS_ws)) {
-for (i in 2:nrow(huc180102CA_ws)) {
+#   site_number <- huc110300KS_ws$site_no[i]
+# for (i in 2:nrow(huc180102CA_ws)) {
+#   site_number <- huc180102CA_ws$site_no[i]
   
-  ## CHOOSE watershed before running for loop
-  # site_number <- huc040500MI_ws$site_no[i]
-  # site_number <- huc110300KS_ws$site_no[i]
-  site_number <- huc180102CA_ws$site_no[i]
   
   ## RETRIEVE site info and streamflow data for gage station
   site_info <- dataRetrieval::readNWISsite(site_number)
@@ -74,6 +72,27 @@ for (i in 2:nrow(huc180102CA_ws)) {
   raw_daily <- subset(raw_daily, select = c(3,4))
   raw_daily$Year <- as.numeric(format(raw_daily$Date, "%Y"))
   
+  
+  # ## START loop at i = 2 because i = 1 is column "Date"
+  # i = 2
+  # 
+  # ## UN-COMMENT corresponding watershed lines and save location before running for loop
+  # # for (i in 2:ncol(huc040500MI_sf)) {
+  # #   site_name <- colnames(huc040500MI_sf[i])
+  # #   sf_select <- data.frame(huc040500MI_sf[[1]], huc040500MI_sf[[i]])
+  # for (i in 2:ncol(huc110300KS_sf)) {
+  #   site_name <- colnames(huc110300KS_sf[i])
+  #   sf_select <- data.frame(huc110300KS_sf[[1]], huc110300KS_sf[[i]])
+  # # for (i in 2:ncol(huc180102CA_sf)) {
+  # #   site_name <- colnames(huc180102CA_sf[i])
+  # #   sf_select <- data.frame(huc180102CA_sf[[1]], huc180102CA_sf[[i]])
+  # 
+  #   ## PREPARE dataframe for calculations
+  #   colnames(sf_select) <- c("Date", "Discharge")
+  #   sf_select$Year <- as.numeric(format(sf_select[[1]], "%Y"))
+  
+    
+    
   ## CALCULATE number of days with data at this station
   countData <- raw_daily %>% 
     group_by(Year) %>% 
@@ -87,14 +106,14 @@ for (i in 2:nrow(huc180102CA_ws)) {
   colnames(percentData) <- c("Year", "PercentData", "SiteName")
   
   ## only run for i = 1 to prime dataframe for joining, then comment out and run for loop
-  # percentDataMI <- percentData
+  percentDataMI <- percentData
   # percentDataKS <- percentData
   # percentDataCA <- percentData
   
-  ## JOIN station data to watershed dataframe
-  # percentDataMI <- rbind(percentDataMI, percentData)
+  ## RUN for i >=2, JOIN station data to watershed dataframe
+  percentDataMI <- rbind(percentDataMI, percentData)
   # percentDataKS <- rbind(percentDataKS, percentData)
-  percentDataCA <- rbind(percentDataCA, percentData)
+  # percentDataCA <- rbind(percentDataCA, percentData)
 
 }
 
@@ -103,18 +122,20 @@ for (i in 2:nrow(huc180102CA_ws)) {
 ggplot(percentDataMI, aes(x = Year, y = SiteName, fill = PercentData)) +
   geom_tile() +
   scale_fill_gradient(low = "black", high = "springgreen4") +
-  # scale_x_discrete(breaks = c("1900", "1910", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2022")) +
-  theme(panel.grid.major = element_line(size = 1), panel.grid.minor = element_line(size = 0.5)) +
-  geom_vline (xintercept = 1965, color = "black")
+  scale_x_continuous(breaks = seq(1900, 2022, 20), minor_breaks = seq(1900, 2022, 5)) +
+  theme(panel.grid.major.x = element_line(size = 0.75), panel.grid.minor = element_line(size = 0.1)) +
+  geom_vline(xintercept = 1965, color = "black")
   
 ggplot(percentDataKS, aes(x = Year, y = SiteName, fill = PercentData)) +
   geom_tile() +
   scale_fill_gradient(low = "black", high = "tan4") +
-  theme(panel.grid.major = element_line(size = 1), panel.grid.minor = element_line(size = 0.5)) +
-  geom_vline (xintercept = 1965, color = "black")
+  scale_x_continuous(breaks = seq(1900, 2022, 20), minor_breaks = seq(1900, 2022, 5)) +
+  theme(panel.grid.major.x = element_line(size = 0.75), panel.grid.minor = element_line(size = 0.1)) +
+  geom_vline(xintercept = 1963, color = "black")
 
 ggplot(percentDataCA, aes(x = Year, y = SiteName, fill = PercentData)) +
   geom_tile() +
   scale_fill_gradient(low = "black", high = "plum4") +
-  theme(panel.grid.major = element_line(size = 1), panel.grid.minor = element_line(size = 0.5)) +
-  geom_vline (xintercept = 1965, color = "black")
+  scale_x_continuous(breaks = seq(1900, 2022, 20), minor_breaks = seq(1900, 2022, 5)) +
+  theme(panel.grid.major.x = element_line(size = 0.75), panel.grid.minor = element_line(size = 0.1)) +
+  geom_vline(xintercept = 1964, color = "black")

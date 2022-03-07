@@ -219,16 +219,16 @@ MI_meteo_stations <- rnoaa::meteo_nearby_stations(MI_8, lat_colname = "lat", lon
 ## START loop at i = 2 because i = 1 is column "Date"
 i = 2
 
-## UN-COMMENT corresponding watershed lines 
-for (i in 2:ncol(huc040500MI_sf)) {
-  site_name <- colnames(huc040500MI_sf[i])
-  sf_select <- data.frame(huc040500MI_sf[[1]], huc040500MI_sf[[i]])
+## UN-COMMENT corresponding watershed lines and save location before running for loop
+# for (i in 2:ncol(huc040500MI_sf)) {
+#   site_name <- colnames(huc040500MI_sf[i])
+#   sf_select <- data.frame(huc040500MI_sf[[1]], huc040500MI_sf[[i]])
 # for (i in 2:ncol(huc110300KS_sf)) {
 #   site_name <- colnames(huc110300KS_sf[i])
 #   sf_select <- data.frame(huc110300KS_sf[[1]], huc110300KS_sf[[i]])
-# for (i in 2:ncol(huc180102CA_sf)) { 
-#   site_name <- colnames(huc180102CA_sf[i])
-#   sf_select <- data.frame(huc180102CA_sf[[1]], huc180102CA_sf[[i]])
+for (i in 2:ncol(huc180102CA_sf)) {
+  site_name <- colnames(huc180102CA_sf[i])
+  sf_select <- data.frame(huc180102CA_sf[[1]], huc180102CA_sf[[i]])
   
   ## PREPARE dataframe for calculations  
   colnames(sf_select) <- c("Date", "Discharge")
@@ -291,9 +291,9 @@ for (i in 2:ncol(huc040500MI_sf)) {
   data_melt <- reshape2::melt(sf_metrics, measure.vars = 2:7, variable.name = "Metric", value.name = "Discharge")
   
   ## SAVE plot of streamgage metrics, CHOOSE watershed before running for loop
-  png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_MI/MI_", i-1, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
+  # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_MI/MI_", i-1, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
   # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_KS/KS_", i-1, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
-  # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_CA/CA_", i-1, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
+  png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_CA/CA_", i-1, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
   
   ## PLOT options
   p_metrics <- ggplot2::ggplot(data_melt, aes(x = Year, y = Discharge, color = Metric, linetype = Metric, size = Metric)) +
