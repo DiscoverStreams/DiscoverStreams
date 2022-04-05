@@ -106,7 +106,7 @@ for (i in 2:nrow(huc040500MI_ws)) {
   colnames(percentData) <- c("Year", "PercentData", "SiteName")
   
   ## only run for i = 1 to prime dataframe for joining, then comment out and run for loop
-  percentDataMI <- percentData
+  # percentDataMI <- percentData
   # percentDataKS <- percentData
   # percentDataCA <- percentData
   

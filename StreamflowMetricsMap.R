@@ -37,17 +37,17 @@ us_rivers <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documen
     us_rivers_df <- left_join(us_rivers_df, us_rivers@data, by = "id")
 
 ## IMPORT St. Joseph watershed boundary
-StJoseph_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/MI/040500MI.geojson")
+SELakeMI_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/MI/040500MI_WSboundary.geojson")
     ## convert spatial object to a ggplot ready data frame
-    StJoseph_WS_boundary_df <- tidy(StJoseph_WS_boundary)
+    SELakeMI_WS_boundary_df <- tidy(SELakeMI_WS_boundary)
     ## make sure the shapefile attribute table has an id column
-    StJoseph_WS_boundary$id <- rownames(StJoseph_WS_boundary@data)
+    SELakeMI_WS_boundary$id <- rownames(SELakeMI_WS_boundary@data)
     ## join the attribute table from the spatial object to the new data frame
-    StJoseph_WS_boundary_df <- left_join(StJoseph_WS_boundary_df, StJoseph_WS_boundary@data, by = "id")
+    SELakeMI_WS_boundary_df <- left_join(SELakeMI_WS_boundary_df, SELakeMI_WS_boundary@data, by = "id")
 
 
 ## IMPORT Middle Arkansas River watershed boundary
-MidArkRiver_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/KS/110300KS.geojson")
+MidArkRiver_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/KS/110300KS_WSboundary.geojson")
     ## convert spatial object to a ggplot ready data frame
     MidArkRiver_WS_boundary_df <- tidy(MidArkRiver_WS_boundary)
     ## make sure the shapefile attribute table has an id column
@@ -56,7 +56,7 @@ MidArkRiver_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of 
     MidArkRiver_WS_boundary_df <- left_join(MidArkRiver_WS_boundary_df, MidArkRiver_WS_boundary@data, by = "id")
 
 ## IMPORT Klamath watershed boundary
-Klamath_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/CA/180102CA.geojson")
+Klamath_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/CA/180102CA_WSboundary.geojson")
     ## convert spatial object to a ggplot ready data frame
     Klamath_WS_boundary_df <- tidy(Klamath_WS_boundary)
     ## make sure the shapefile attribute table has an id column
@@ -75,7 +75,7 @@ Klamath_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kans
 ggplot() +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) +
   geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") 
-  # geom_polygon(data = StJoseph_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
+  # geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
   # geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5 ) +
   # geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5 ) +
   # geom_point(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va), fill = "plum4") +
@@ -84,29 +84,43 @@ ggplot() +
 
 MI_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
-  geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
-  geom_polygon(data = StJoseph_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
-  geom_point(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va), color = "plum4", size = 3) +
-  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = row.names(huc040500MI_ws)), size = 4) +
-  xlim(-87, -83.75) + ylim(41.25, 43.5)
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
+  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = `tau+/-`, fill = `tau+/-`, alpha = p), size = 3) +
+  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label =id), size =4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  # + xlim(-87, -83.75) + ylim(41.25, 43.5)
+  ggtitle("M-K Test on annual MAM7 for SE Lake Michigan Watershed 1962 - 2021") + 
+  theme(legend.position="none")
 MI_map
 
 KS_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va), color = "tan4", size = 3) +
-  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = row.names(huc110300KS_ws)), size = 4) 
-  # + xlim(-103, -96.5) + ylim(36, 39.5)
+  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = `tau+/-`, fill = `tau+/-`, alpha = p), size = 3) +
+  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = id), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  xlim(-103, -96.5) + ylim(36, 39.5) +
+  ggtitle("M-K Test on annual MAM7 for Middle Arkansas Watershed 1962 - 2021") +
+  theme(legend.position="none")
 KS_map
 
 CA_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
-  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
-  geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
-  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va), color = "springgreen4", size = 3) +
-  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = row.names(huc180102CA_ws)), size = 4) 
+  # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
+  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = `tau+/-`, fill = `tau+/-`, alpha = p), size = 3) +
+  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = id), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
 # + xlim(-103, -96.5) + ylim(36, 39.5)
-
+  ggtitle("M-K Test on annual MAM7 for Klamath Watershed 1962 - 2021") +
+  theme(legend.position="none")
 CA_map
 
