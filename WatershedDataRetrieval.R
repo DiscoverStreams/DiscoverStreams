@@ -15,7 +15,7 @@ library(rnoaa)
 
 ## CONNECT to SQL database on UWaterloo server
 ## --> need mySQL but not exposed to internet 
-con_UW <- dbConnect(odbc(),
+con_UW <- odbc::dbConnect(odbc(),
                  Driver = "MySQL ODBC 8.0 Unicode Driver", 
                  Server = "interactiveviz.uwaterloo.ca",
                  Database = "interact_water",
@@ -34,18 +34,18 @@ con_KS <- dbConnect(odbc(),
                  Port = 3306)
 
 
-## Run once, no need to change parameters for NWIS streamflow data retrieval from NWIS
+## Run once, NEED to change parameters for NWIS streamflow data retrieval from NWIS
 parameter_code <- c("00060")
 parameter_names <- c("Discharge, cubic feet per second")
-start_date <- "1962-10-01"
-end_date <- "2021-09-30"
+start_date <- ""    
+end_date <- ""
 
 
 ### WATERSHED STATION INFO - all gage stations within each watershed ###
 huc040500MI_NWISsites <- c("04100222", "04100500", "04101000", "04101370", "04101225", "04101500", "04099510", "04099750", "04098430", "040975296", "040975299", "04096767", "04097540", "04098620", "04098636", "04098980", "04099000", "04098757", "0409754132", "04097500", "04096590", "04096681", "04096970", "0409651496", "04096272", "04096312", "04096325", "04096340", "04096400", "04096405", "04096500", "04096515", "04096600", "04096900", "04097060", "04097170", "04097195", "04097200", "04097528", "040975299", "04097970", "04098000", "04098500", "04099610", "04099808", "04099850", "04100000", "04100252", "04100295", "04100377", "04100465", "041015313", "04101535", "04101590", "04101800", "04102000", "04102085", "04102148", "04102320", "04102420", "04102500", "04102533", "04102700", "04102776", "04108800", "04108801", "04108862", "04108872", "041027908", "04102798", "04102988", "04103490", "04103500", "041035285", "04104945", "04105000", "04105500", "04105700", "04106000", "04106500", "04106400", "04106320", "04108600", "04108645", "04108660", "04102850", "04103010", "04104000", "04104500", "04105800", "04106180", "04106190", "04106300", "04106906", "04107850", "04108000", "04108500", "04108670", "04109000", "04111000", "04112700", "04112850", "04111379", "04112000", "04112500", "04113000", "04114498", "04114000", "04109500", "04110000", "04111500", "04112904", "04113097", "04114500", "04115000", "04115265", "04116000", "04116500", "04118500", "04118564", "04119000", "04119055", "04119070", "04119160", "04119345", "04119365", "04119400", "04120194", "04119300", "04120250", "04117004", "04117500", "04118000", "04118105", "04117000")
 
-huc040500MI_counties <- c("Muskegon", "Montcalm", "Gratiot", "Ottawa", "Kent", "Ionia", "Clinton", "Shiawassee", "Allegan", "Barry", "Eaton", "Ingham", "Livingston", "Van Buren", "Kalamazoo", "Calhoun", "Jackson", "Berrien", "Cass", "St. Joseph", "Branch", "Hillsdale", )
-huc040500IN_counties <- c("St. Joseph", "Elkhart", "LaGrange", "Steuben", "Noble")
+# huc040500MI_counties <- c("Muskegon", "Montcalm", "Gratiot", "Ottawa", "Kent", "Ionia", "Clinton", "Shiawassee", "Allegan", "Barry", "Eaton", "Ingham", "Livingston", "Van Buren", "Kalamazoo", "Calhoun", "Jackson", "Berrien", "Cass", "St. Joseph", "Branch", "Hillsdale")
+# huc040500IN_counties <- c("St. Joseph", "Elkhart", "LaGrange", "Steuben", "Noble")
 
 huc110300KS_NWISsites <- c("07137000", "07137500", "07137010", "07138000", "07138020", "07138050", "375615101170800", "07138070", "07138064", "07138075", "07139000", "07137500", "07138062", "07138063", "07138065", "07138650", "07138660", "07139500", "07141220", "07141300", "07139800", "07140000", "07140500", "07141200", "07140700", "07140850", "07141000", "07140900", "07140885", "07140880", "07140890", "07141175", "07141780", "07141900", "07142019", "07141770", "07142015", "07142020", "07142300", "07142575", "07142620", "07142680", "07143330", "07143340", "07143350", "07143375", "07142800", "07143400", "07143300", "07143310", "07142860", "07142900", "07143665", "07143672", "07144050", "375348097262800", "07144100", "07144201", "07144200","07143600", "07143680", "07144000", "375350097262800", "07144300", "07144325", "07144330", "07144340", "07144480", "07144485", "07144486", "07144490", "07144550", "07144570", "07145600", "07145700", "07146500", "07144301", "07144470", "07144780", "07144790", "07144601", "07144660", "07144680", "07144730", "07144795", "07144800", "07145200", "07144850", "07144910", "07145500", "07146800", "07147070", "07146570", "07146623", "07146830", "07146895", "07146990", "07147050", "07147060", "07147190", "07147800", "07147900", "07147600")
 
@@ -90,6 +90,8 @@ site_select <- data.frame()
   site_select <- rbind(site_select, site_info)
   site_select <- site_select[!duplicated(site_select), ]
   site_select <- subset(site_select, yearsAvail >= 30, select = c(1:8))
+  if(count(raw_daily$X_00060_00003==NA))
+  # site_select <- subset(site_select, yearsAvail >= 100, select = c(1:8))
   
   ## APPEND HUC06 site selected to corresponding HUC06 data frame, CHOOSE HUC06 by commenting out other HUC06 watersheds
   # huc040500MI <- rbind(huc040500MI, site_select)
@@ -101,37 +103,26 @@ site_select <- data.frame()
 
 }
 
-
-
-## CREATE watershed object to work with and RESET as needed without re-running for loops
-huc040500MI_ws <- huc040500MI
-huc110300KS_ws <- huc110300KS
-huc180102CA_ws <- huc180102CA
-
 ## SUBSET by start and end dates
-huc040500MI_ws <- subset(huc040500MI_ws, startDate == "1962-10-01", select = c(1:8))
-huc040500MI_ws <- subset(huc040500MI_ws, endDate == "2021-09-30", select = c(1:8))
-huc110300KS_ws <- subset(huc110300KS_ws, startDate == "1962-10-01", select = c(1:8))
-huc110300KS_ws <- subset(huc110300KS_ws, endDate == "2021-09-30", select = c(1:8))
-huc180102CA_ws <- subset(huc180102CA_ws, startDate == "1962-10-01", select = c(1:8))
-huc180102CA_ws <- subset(huc180102CA_ws, endDate == "2021-09-30", select = c(1:8))
+huc040500MI_ws_1962_sel <- subset(huc040500MI_ws, startDate == "1962-10-01", select = c(1:8))
+huc040500MI_ws_1962_2021_sel <- subset(huc040500MI_ws_1962_sel, endDate == "2021-09-30", select = c(1:8))
+huc110300KS_ws_1962_sel <- subset(huc110300KS_ws, startDate == "1962-10-01", select = c(1:8))
+huc110300KS_ws_1962_2021_sel <- subset(huc110300KS_ws_1962_sel, endDate == "2021-09-30", select = c(1:8))
+huc180102CA_ws_1962_sel <- subset(huc180102CA_ws, startDate == "1962-10-01", select = c(1:8))
+huc180102CA_ws_1962_2021_sel <- subset(huc180102CA_ws_1962_sel, endDate == "2021-09-30", select = c(1:8))
 
-## ADD column id for indexing
-huc040500MI_ws$id <- 1:nrow(huc040500MI_ws)
-huc110300KS_ws$id <- 1:nrow(huc110300KS_ws)
-huc180102CA_ws$id <- 1:nrow(huc180102CA_ws)
+huc040500MI_ws_ep <- subset(huc040500MI_ws, startDate == "1962-10-01", select = c(1:8))
+huc040500MI_ws_ep <- subset(huc040500MI_ws_1962_sel, endDate == "2021-09-30", select = c(1:8))
+huc110300KS_ws_ep <- subset(huc110300KS_ws, startDate == "1962-10-01", select = c(1:8))
+huc110300KS_ws_ep <- subset(huc110300KS_ws_1962_sel, endDate == "2021-09-30", select = c(1:8))
+huc180102CA_ws_ep <- subset(huc180102CA_ws, startDate == "1962-10-01", select = c(1:8))
+huc180102CA_ws_ep <- subset(huc180102CA_ws_1962_sel, endDate == "2021-09-30", select = c(1:8))
 
-## ADD columns for p and tau values for each station from Mann-Kendall Test
-huc040500MI_ws$p <- NA
-huc040500MI_ws$tau <- NA
-huc040500MI_ws$`tau+/-` <- NA
-huc110300KS_ws$p <- NA
-huc110300KS_ws$tau <- NA
-huc110300KS_ws$`tau+/-` <- NA
-huc180102CA_ws$p <- NA
-huc180102CA_ws$tau <- NA
-huc180102CA_ws$`tau+/-` <- NA
 
+## CREATE/SAVE watershed object to work with and RESET as needed without re-running for loops
+huc040500MI_ws <- huc040500MI_ws_long
+huc110300KS_ws <- huc110300KS_ws_long
+huc180102CA_ws <- huc180102CA_ws_long
 
 
 ## optional WRITE watershed site information to CSV for use with GIS and webGIS
@@ -139,10 +130,15 @@ write.csv(huc040500MI_ws, "~/GradSchool/DiscoverStreams/outputs/watershed_info/h
 write.csv(huc110300KS_ws, "~/GradSchool/DiscoverStreams/outputs/watershed_info/huc110300KS_1962-2021.csv")
 write.csv(huc180102CA_ws, "~/GradSchool/DiscoverStreams/outputs/watershed_info/huc180102CA_1962-2021.csv")
 
+## optional WRTIE watershed site information to mySQL database for use with webapp
+dbWriteTable(con_UW, "interact_sitedata_SELakeMI", huc040500MI_ws, overwrite = TRUE)
+dbWriteTable(con_UW, "interact_sitedata_MidArkansas", huc110300KS_ws, overwrite = TRUE)
+dbWriteTable(con_UW, "interact_sitedata_Klamath", huc180102CA_ws, overwrite = TRUE)
+
 
 
 ### STREAMFLOW from NWIS ###
-## RUN corresponding streamflow dataframe for each HUC06, also set HUC06 in dataframe setup and in for loop
+## CLEAR corresponding streamflow dataframe for each HUC06, also set HUC06 in dataframe setup and in for loop AND DOUBLE-CHECK START & END DATES
 huc040500MI_sf <- data.frame()
 huc110300KS_sf <- data.frame()
 huc180102CA_sf <- data.frame()
@@ -174,17 +170,20 @@ for (i in 2:nrow(huc180102CA_ws)) {
   
   ## RUN for i >= 2, APPEND streamflow data for site selected to corresponding HUC06 streamflow data frame, CHOOSE HUC06 by commenting out other HUC06 watersheds
   # huc040500MI_sf <- full_join(huc040500MI_sf, raw_daily, by = "Date")
-  # huc040500MI_sf <- huc040500MI_sf[!duplicated(as.list(huc040500MI_sf))]
   # huc110300KS_sf <- full_join(huc110300KS_sf, raw_daily, by = "Date")
-  # huc110300KS_sf <- huc110300KS_sf[!duplicated(as.list(huc110300KS_sf))]
   huc180102CA_sf <- full_join(huc180102CA_sf, raw_daily, by = "Date")
-  huc180102CA_sf <- huc180102CA_sf[!duplicated(as.list(huc180102CA_sf))]
-  
-  ## WRITE data to SQL database of corresponding watershed
-  dbWriteTable(con_UW, "interact_streamflow_Klamath", huc180102CA_sf)
-  dbExecute(con_UW, "UPDATE interact_streamflow_Klamath", huc180102CA_sf)
   
 }
+
+## SAVE resulting streamflow object to dataframe
+huc040500MI_sf_long <- huc040500MI_sf
+huc110300KS_sf_long <- huc110300KS_sf
+huc180102CA_sf_long <- huc180102CA_sf
+
+## WRITE/UPDATE data to SQL database of corresponding watershed
+dbWriteTable(con_UW, "interact_streamflow_SELakeMI", huc040500MI_sf, overwrite = TRUE)
+dbWriteTable(con_UW, "interact_streamflow_MidArkansas", huc110300KS_sf, overwrite = TRUE)
+dbWriteTable(con_UW, "interact_streamflow_Klamath", huc180102CA_sf, overwrite = TRUE)
 
 
 ### WATER USE (NWIS) ###

@@ -12,13 +12,33 @@ library(trend)
 
 
 
-# huc040500MI_ws
-# huc110300KS_ws 
-# huc180102CA_ws 
+## SET streamflow dataframe for loop
+# huc040500MI_sf <- huc040500MI_sf_long
+# huc110300KS_sf <- huc110300KS_sf_long
+# huc180102CA_sf <- huc180102CA_sf_long
+
+## SET watershed object to work with 
+huc040500MI_ws <- huc040500MI_ws_1962_2021_sel
+huc110300KS_ws <- huc110300KS_ws_1962_2021_sel
+huc180102CA_ws <- huc180102CA_ws_1962_2021_sel
+
+## SUBSET watershed high-density data to neutral climate year relative to the watershed
+huc040500MI_ws <- subset(huc040500MI_ws, startDate == "1961-10-01", select = c(1:8))
+huc040500MI_ws <- subset(huc040500MI_ws, endDate == "2021-09-30", select = c(1:8))
+huc110300KS_ws <- subset(huc110300KS_ws, startDate == "1962-10-01", select = c(1:8))
+huc110300KS_ws <- subset(huc110300KS_ws, endDate == "2021-09-30", select = c(1:8))
+huc180102CA_ws <- subset(huc180102CA_ws, startDate == "1964-10-01", select = c(1:8))
+huc180102CA_ws <- subset(huc180102CA_ws, endDate == "2021-09-30", select = c(1:8))
 
 ########## STREAM DEPLETION METRICS ##########
+## Run once, NEED to change parameters for NWIS streamflow data retrieval from NWIS
+parameter_code <- c("00060")
+parameter_names <- c("Discharge, cubic feet per second")
+start_date <- "1964-10-01"    
+end_date <- "2021-09-20"
+
 ## START loop at i = 2 because i = 1 is column "Date"
-i = 2
+# i = 2
 
 ## UN-COMMENT corresponding watershed lines and save location before running for loop
 # for (i in 2:ncol(huc040500MI_sf)) {
@@ -27,11 +47,29 @@ i = 2
 # for (i in 2:ncol(huc110300KS_sf)) {
 #   site_name <- colnames(huc110300KS_sf[i])
 #   sf_select <- data.frame(huc110300KS_sf[[1]], huc110300KS_sf[[i]])
-for (i in 2:ncol(huc180102CA_sf)) {
-  site_name <- colnames(huc180102CA_sf[i])
-  sf_select <- data.frame(huc180102CA_sf[[1]], huc180102CA_sf[[i]])
+# for (i in 2:ncol(huc180102CA_sf)) {
+#   site_name <- colnames(huc180102CA_sf[i])
+#   sf_select <- data.frame(huc180102CA_sf[[1]], huc180102CA_sf[[i]])
 
-  ## PREPARE dataframe for calculations  
+
+
+## RETRIEVE streamflow data to get dataframe without NAs -- NA's end up being coerced by createlfobject
+
+i = 1
+# for (i in 1:nrow(huc040500MI_ws)) {
+#         site_number <- huc040500MI_ws$site_no[i]
+# for (i in 1:nrow(huc110300KS_ws)) {
+#       site_number <- huc110300KS_ws$site_no[i]
+for (i in 1:nrow(huc180102CA_ws)) {
+  site_number <- huc180102CA_ws$site_no[i]
+  
+  ## RETRIEVE site info and streamflow data for gage station
+  site_info <- dataRetrieval::readNWISsite(site_number)
+  site_name <- site_info$station_nm
+  raw_daily <- dataRetrieval::readNWISdv(site_number, parameter_code, start_date, end_date)
+ 
+  ## PREPARE dataframe for calculations 
+  sf_select <- subset(raw_daily, select = c(3,4))
   colnames(sf_select) <- c("Date", "Discharge")
   sf_select$Year <- as.numeric(format(sf_select[[1]], "%Y"))
   
@@ -89,41 +127,62 @@ for (i in 2:ncol(huc180102CA_sf)) {
   # sf_metrics <- left_join(sf_metrics, BFI, by = "Year")
   
   ## CALCULATE Mann-Kendall Test
-  mk_test <- trend::mk.test(sf_metrics$MAM7)
+  mk_test_MAM7 <- trend::mk.test(sf_metrics$MAM7)
   ## for MI ws fails at i = 8, i = 13, i = 16, i = 19, i = 23, i = 24, i = 27, i = 29
   ## for KS ws fails at i = 4
   ## for CA ws fails at i = 3 and i = 14
+  sf_metrics_sel <- sf_metrics[!is.na(sf_metrics$MeanBaseflow), ]
+  mk_test_Baseflow <- trend::mk.test(sf_metrics_sel$MeanBaseflow)
   
+  ## APPEND MK results to WS dataframe, CHOOSE corresponding watershed before running for loop
+  # huc040500MI_ws$p_MAM7[i] <- mk_test_MAM7$p.value[1]
+  # if(mk_test_MAM7$estimates[3] < 0)
+  #   huc040500MI_ws$tau_MAM7[i] <- "-"
+  # if(mk_test_MAM7$estimates[3] > 0)
+  #   huc040500MI_ws$tau_MAM7[i] <- "+"
+  # huc040500MI_ws$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
+  # if(mk_test_Baseflow$estimates[3] < 0)
+  #   huc040500MI_ws$tau_Baseflow[i] <- "-"
+  # if(mk_test_Baseflow$estimates[3] > 0)
+  #   huc040500MI_ws$tau_Baseflow[i] <- "+"
   
-  ## APPEND data to WS dataframe, CHOOSE corresponding watershed before running for loop
-  # huc040500MI_ws$p[i-1] <- mk_test$p.value[1]
-  # huc040500MI_ws$tau[i-1] <- mk_test$estimates[3]
-  # if(mk_test$estimates[3] < 0)
-  #   huc040500MI_ws$`tau+/-`[i-1] <- "-"
-  # if(mk_test$estimates[3] > 0)
-  #   huc040500MI_ws$`tau+/-`[i-1] <- "+"
-  # huc110300KS_ws$p[i-1] <- mk_test$p.value[1]
-  # huc110300KS_ws$tau[i-1] <- mk_test$estimates[3]
-  # if(mk_test$estimates[3] < 0)
-  #   huc110300KS_ws$`tau+/-`[i-1] <- "-"
-  # if(mk_test$estimates[3] > 0)
-  #   huc110300KS_ws$`tau+/-`[i-1] <- "+"
-  huc180102CA_ws$p[i-1] <- mk_test$p.value[1]
-  huc180102CA_ws$tau[i-1] <- mk_test$estimates[3]
-  if(mk_test$estimates[3] < 0)
-    huc180102CA_ws$`tau+/-`[i-1] <- "-"
-  if(mk_test$estimates[3] > 0)
-    huc180102CA_ws$`tau+/-`[i-1] <- "+"
+  # huc110300KS_ws$p_MAM7[i] <- mk_test_MAM7$p.value[1]
+  # if(mk_test_MAM7$estimates[3] < 0)
+  #   huc110300KS_ws$tau_MAM7[i] <- "-"
+  # if(mk_test_MAM7$estimates[3] > 0)
+  #   huc110300KS_ws$tau_MAM7[i] <- "+"
+  # huc110300KS_ws$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
+  # if(mk_test_Baseflow$estimates[3] < 0)
+  #   huc110300KS_ws$tau_Baseflow[i] <- "-"
+  # if(mk_test_Baseflow$estimates[3] > 0)
+  #   huc110300KS_ws$tau_Baseflow[i] <- "+"
   
-} 
+  huc180102CA_ws$p_MAM7[i] <- mk_test_MAM7$p.value[1]
+  if(mk_test_MAM7$estimates[3] < 0)
+    huc180102CA_ws$tau_MAM7[i] <- "-"
+  if(mk_test_MAM7$estimates[3] > 0)
+    huc180102CA_ws$tau_MAM7[i] <- "+"
+  huc180102CA_ws$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
+  if(mk_test_Baseflow$estimates[3] < 0)
+    huc180102CA_ws$tau_Baseflow[i] <- "-"
+  if(mk_test_Baseflow$estimates[3] > 0)
+    huc180102CA_ws$tau_Baseflow[i] <- "+"
   
+}
+  
+
+
+
   ## PREPARE resulting metrics for plotting
   data_melt <- reshape2::melt(sf_metrics, measure.vars = 2:7, variable.name = "Metric", value.name = "Discharge")
   
   ## SAVE plot of streamgage metrics, CHOOSE watershed before running for loop
-  # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_MI/MI_", i-1, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
-  # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_KS/KS_", i-1, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
-  png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_CA/CA_", i-1, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
+  png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_MI/MI_", i, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
+  # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_KS/KS_", i, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
+  # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_CA/CA_", i, "_metrics.png", sep = ""), width = 757, height = 464, unit = "px")
+  
+  ## REMOVE na rows before plotting
+  data_melt <- data_melt[!is.na(data_melt$Discharge), ]
   
   ## PLOT options
   p_metrics <- ggplot2::ggplot(data_melt, aes(x = Year, y = Discharge, color = Metric, linetype = Metric, size = Metric)) +
@@ -144,16 +203,22 @@ for (i in 2:ncol(huc180102CA_sf)) {
   dev.off()
   
   ## SAVE CSV of streamgage metrics, CHOOSE watershed before running for loop --> in the future these should write to SQL database
-  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_MI/MI_", i-1, "_metrics.csv"))
-  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_KS/KS_", i-1, "_metrics.csv"))
-  write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_CA/CA_", i-1, "_metrics.csv"))
+  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_MI/MI_", i, "_metrics.csv"))
+  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_KS/KS_", i, "_metrics.csv"))
+  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_CA/CA_", i, "_metrics.csv"))
   
 }
 
 
+## SAVE resulting watershed object 
+huc040500MI_ws_1962_2021_sel <- huc040500MI_ws
+huc110300KS_ws_1962_2021_sel <- huc110300KS_ws
+huc180102CA_ws_1962_2021_sel <- huc180102CA_ws
 
-########## MANN-KENDALL TREND TEST ##########
-mk.test(sf_metrics_CA$MAM7)
+## SAVE resulting streamflow metrics to dataframe
+huc040500MI_sfmetrics_long <- sf_metrics
+huc110300KS_sfmetrics_long <- sf_metrics
+huc180102CA_sfmetrics_long <- sf_metrics
 
 
 
