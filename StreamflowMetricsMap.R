@@ -90,11 +90,11 @@ MI_mk_MAM7_map <- ggplot() +
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
   geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_MAM7, fill = tau_MAM7, alpha = p_MAM7), size = 3) +
   geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size =4) +
-  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_shape_manual(values = c(24, 25), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
-  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  scale_fill_manual(values = c("darkblue", "darkred"), na.translate= FALSE) +
   # + xlim(-87, -83.75) + ylim(41.25, 43.5)
-  ggtitle("M-K Test on Annual MAM7 for SE Lake Michigan Watershed 1961 - 2021") + 
+  ggtitle("M-K Test on Annual MAM7 for SE Lake Michigan Watershed 1901 - 2021") + 
   theme(legend.position="none")
 MI_mk_MAM7_map
 
@@ -127,18 +127,18 @@ CA_mk_MAM7_map <- ggplot() +
 CA_mk_MAM7_map
 
 
-##### PLOT MK test for baseflow #####
+##### PLOT MK test for Mean Annual Baseflow #####
 MI_mk_Baseflow_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
   geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Baseflow, fill = tau_Baseflow, alpha = p_Baseflow), size = 3) +
   geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size =4) +
-  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_shape_manual(values = c(24, 25), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
-  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  scale_fill_manual(values = c("darkblue", "darkred"), na.translate= FALSE) +
   # + xlim(-87, -83.75) + ylim(41.25, 43.5)
-  ggtitle("M-K Test on Annual Mean Baseflow for SE Lake Michigan Watershed 1961 - 2021") + 
+  ggtitle("M-K Test on Annual Mean Baseflow for SE Lake Michigan Watershed 1901 - 2021") + 
   theme(legend.position="none")
 MI_mk_Baseflow_map
 
@@ -169,3 +169,227 @@ CA_mk_Baseflow_map <- ggplot() +
   ggtitle("M-K Test on Annual Mean Baseflow for Klamath Watershed 1964 - 2021") +
   theme(legend.position="none")
 CA_mk_Baseflow_map
+
+
+##### PLOT MK test for Mean Annual Discharge (MeanQ) #####
+MI_mk_MeanQ_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
+  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_MeanQ, fill = tau_MeanQ, alpha = p_MeanQ), size = 3) +
+  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size =4) +
+  scale_shape_manual(values = c(24, 25), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkblue", "darkred"), na.translate= FALSE) +
+  # + xlim(-87, -83.75) + ylim(41.25, 43.5)
+  ggtitle("M-K Test on Annual Mean Discharge for SE Lake Michigan Watershed 1901 - 2021") + 
+  theme(legend.position="none")
+MI_mk_MeanQ_map
+
+KS_mk_MeanQ_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
+  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MeanQ, fill = tau_MeanQ, alpha = p_MeanQ), size = 3) +
+  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  xlim(-103, -96.5) + ylim(36, 39.5) +
+  ggtitle("M-K Test on Annual Mean Discharge for Middle Arkansas Watershed 1902 - 2021") +
+  theme(legend.position="none")
+KS_mk_MeanQ_map
+
+CA_mk_MeanQ_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
+  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MeanQ, fill = tau_MeanQ, alpha = p_MeanQ), size = 3) +
+  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  # + xlim(-103, -96.5) + ylim(36, 39.5)
+  ggtitle("M-K Test on Annual Mean Discharge for Klamath Watershed 1904 - 2021") +
+  theme(legend.position="none")
+CA_mk_MeanQ_map
+
+
+##### PLOT MK test for Q10 #####
+MI_mk_Q10_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
+  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q10, fill = tau_Q10, alpha = p_Q10), size = 3) +
+  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size =4) +
+  scale_shape_manual(values = c(24, 25), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkblue", "darkred"), na.translate= FALSE) +
+  # + xlim(-87, -83.75) + ylim(41.25, 43.5)
+  ggtitle("M-K Test on Annual Q10 for SE Lake Michigan Watershed 1901 - 2021") + 
+  theme(legend.position="none")
+MI_mk_Q10_map
+
+KS_mk_Q10_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
+  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q10, fill = tau_Q10, alpha = p_Q10), size = 3) +
+  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  xlim(-103, -96.5) + ylim(36, 39.5) +
+  ggtitle("M-K Test on Annual Q10 for Middle Arkansas Watershed 1902 - 2021") +
+  theme(legend.position="none")
+KS_mk_Q10_map
+
+CA_mk_Q10_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
+  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q10, fill = tau_Q10, alpha = p_Q10), size = 3) +
+  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  # + xlim(-103, -96.5) + ylim(36, 39.5)
+  ggtitle("M-K Test on Annual Q10 for Klamath Watershed 1904 - 2021") +
+  theme(legend.position="none")
+CA_mk_Q10_map
+
+
+##### PLOT MK test for Q50 #####
+MI_mk_Q50_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
+  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q50, fill = tau_Q50, alpha = p_Q50), size = 3) +
+  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size =4) +
+  scale_shape_manual(values = c(24, 25), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkblue", "darkred"), na.translate= FALSE) +
+  # + xlim(-87, -83.75) + ylim(41.25, 43.5)
+  ggtitle("M-K Test on Annual Q50 for SE Lake Michigan Watershed 1901 - 2021") + 
+  theme(legend.position="none")
+MI_mk_Q50_map
+
+KS_mk_Q50_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
+  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q50, fill = tau_Q50, alpha = p_Q50), size = 3) +
+  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  xlim(-103, -96.5) + ylim(36, 39.5) +
+  ggtitle("M-K Test on Annual Q50 for Middle Arkansas Watershed 1902 - 2021") +
+  theme(legend.position="none")
+KS_mk_Q50_map
+
+CA_mk_Q50_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
+  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q50, fill = tau_Q50, alpha = p_Q50), size = 3) +
+  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  # + xlim(-103, -96.5) + ylim(36, 39.5)
+  ggtitle("M-K Test on Annual Q50 for Klamath Watershed 1904 - 2021") +
+  theme(legend.position="none")
+CA_mk_Q50_map
+
+
+##### PLOT MK test for Q90 #####
+MI_mk_Q90_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
+  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q90, fill = tau_Q90, alpha = p_Q90), size = 3) +
+  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size =4) +
+  scale_shape_manual(values = c(24, 25), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkblue","darkred"), na.translate= FALSE) +
+  # + xlim(-87, -83.75) + ylim(41.25, 43.5)
+  ggtitle("M-K Test on Annual Q90 for SE Lake Michigan Watershed 1901 - 2021") + 
+  theme(legend.position="none")
+MI_mk_Q90_map
+
+KS_mk_Q90_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
+  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q90, fill = tau_Q90, alpha = p_Q90), size = 3) +
+  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  xlim(-103, -96.5) + ylim(36, 39.5) +
+  ggtitle("M-K Test on Annual Q90 for Middle Arkansas Watershed 1902 - 2021") +
+  theme(legend.position="none")
+KS_mk_Q90_map
+
+CA_mk_Q90_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
+  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q90, fill = tau_Q90, alpha = p_Q90), size = 3) +
+  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  # + xlim(-103, -96.5) + ylim(36, 39.5)
+  ggtitle("M-K Test on Annual Q90 for Klamath Watershed 1904 - 2021") +
+  theme(legend.position="none")
+CA_mk_Q90_map
+
+
+##### PLOT MK test for Q95 #####
+MI_mk_Q95_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
+  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q95, fill = tau_Q95, alpha = p_Q95), size = 3) +
+  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size =4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  # + xlim(-87, -83.75) + ylim(41.25, 43.5)
+  ggtitle("M-K Test on Annual Q95 for SE Lake Michigan Watershed 1961 - 2021") + 
+  theme(legend.position="none")
+MI_mk_Q95_map
+
+KS_mk_Q95_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
+  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q95, fill = tau_Q95, alpha = p_Q95), size = 3) +
+  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  xlim(-103, -96.5) + ylim(36, 39.5) +
+  ggtitle("M-K Test on Annual Q95 for Middle Arkansas Watershed 1962 - 2021") +
+  theme(legend.position="none")
+KS_mk_Q95_map
+
+CA_mk_Q95_map <- ggplot() +
+  # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
+  # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
+  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q95, fill = tau_Q95, alpha = p_Q95), size = 3) +
+  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = c(25, 24), na.translate = TRUE, na.value = 1) +
+  scale_alpha_binned(breaks = 0.05, range = c(0.1, 1)) +
+  scale_fill_manual(values = c("darkred", "darkblue"), na.translate= FALSE) +
+  # + xlim(-103, -96.5) + ylim(36, 39.5)
+  ggtitle("M-K Test on Annual Q95 for Klamath Watershed 1964 - 2021") +
+  theme(legend.position="none")
+CA_mk_Q95_map
+
+
+
+
