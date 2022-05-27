@@ -139,8 +139,8 @@ ggplot(sf180102CA, aes(x = Date, y = Percent, color = Watershed)) +
 ## Run once, NEED to change parameters for NWIS streamflow data retrieval from NWIS
 parameter_code <- c("00060")
 parameter_names <- c("Discharge, cubic feet per second")
-start_date <- ""    
-end_date <- ""
+start_date <- "1958-10-01"    
+end_date <- "2021-09-30"
 
 ## SET watershed dataframe for loop
 huc040500MI_ws <- huc040500MI_ws_long
@@ -157,12 +157,12 @@ percentDataCA <- data.frame()
 i = 1
   
 ## CHOOSE watershed before running for loop
-# for (i in 2:nrow(huc040500MI_ws)) {
-#   site_number <- huc040500MI_ws$site_no[i]
+for (i in 2:nrow(huc040500MI_ws)) {
+  site_number <- huc040500MI_ws$site_no[i]
 # for (i in 2:nrow(huc110300KS_ws)) {
 #   site_number <- huc110300KS_ws$site_no[i]
-for (i in 2:nrow(huc180102CA_ws)) {
-  site_number <- huc180102CA_ws$site_no[i]
+# for (i in 2:nrow(huc180102CA_ws)) {
+#   site_number <- huc180102CA_ws$site_no[i]
   
   
   ## RETRIEVE site info and streamflow data for gage station
@@ -192,14 +192,14 @@ for (i in 2:nrow(huc180102CA_ws)) {
   # percentDataCA <- percentData
   
   ## RUN for i >=2, JOIN station data to watershed dataframe
-  # percentDataMI <- rbind(percentDataMI, percentData)
+  percentDataMI <- rbind(percentDataMI, percentData)
   # percentDataKS <- rbind(percentDataKS, percentData)
-  percentDataCA <- rbind(percentDataCA, percentData)
+  # percentDataCA <- rbind(percentDataCA, percentData)
 
 }
 
 ## SAVE resulting dataframes for percent of days with data
-percentDataMI_long <- percentDataMI
+percentDataMI_1958_2021_sel <- percentDataMI
 percentDataKS_long <- percentDataKS
 percentDataCA_long <- percentDataCA
 

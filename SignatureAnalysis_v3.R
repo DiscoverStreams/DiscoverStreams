@@ -18,9 +18,9 @@ library(trend)
 # huc180102CA_sf <- huc180102CA_sf_long
 
 ## SET watershed object to work with 
-huc040500MI_ws <- huc040500MI_ws_1962_2021_sel
-huc110300KS_ws <- huc110300KS_ws_1962_2021_sel
-huc180102CA_ws <- huc180102CA_ws_1962_2021_sel
+huc040500MI_ws <- huc040500MI_ws_long
+huc110300KS_ws <- huc110300KS_ws_long
+huc180102CA_ws <- huc180102CA_ws_long
 
 ## SUBSET watershed high-density data to neutral climate year relative to the watershed
 huc040500MI_ws <- subset(huc040500MI_ws, startDate == "1961-10-01", select = c(1:8))
@@ -34,7 +34,7 @@ huc180102CA_ws <- subset(huc180102CA_ws, endDate == "2021-09-30", select = c(1:8
 ## Run once, NEED to change parameters for NWIS streamflow data retrieval from NWIS
 parameter_code <- c("00060")
 parameter_names <- c("Discharge, cubic feet per second")
-start_date <- ""    
+start_date <- "1961-10-01"    
 end_date <- "2021-09-30"
 
 ## START loop at i = 2 because i = 1 is column "Date"
@@ -56,12 +56,12 @@ end_date <- "2021-09-30"
 ## RETRIEVE streamflow data to get dataframe without NAs -- NA's end up being coerced by createlfobject
 
 i = 1
-# for (i in 1:nrow(huc040500MI_ws)) {
-#         site_number <- huc040500MI_ws$site_no[i]
+for (i in 1:nrow(huc040500MI_ws)) {
+        site_number <- huc040500MI_ws$site_no[i]
 # for (i in 1:nrow(huc110300KS_ws)) {
 #       site_number <- huc110300KS_ws$site_no[i]
-for (i in 1:nrow(huc180102CA_ws)) {
-  site_number <- huc180102CA_ws$site_no[i]
+# for (i in 1:nrow(huc180102CA_ws)) {
+#   site_number <- huc180102CA_ws$site_no[i]
   
   ## RETRIEVE site info and streamflow data for gage station
   site_info <- dataRetrieval::readNWISsite(site_number)
@@ -147,41 +147,41 @@ for (i in 1:nrow(huc180102CA_ws)) {
   mk_test_Q95 <- trend::mk.test(sf_metrics_sel$Q95)
   
   ## APPEND MK results to WS dataframe, CHOOSE corresponding watershed before running for loop
-  # huc040500MI_ws$p_MAM7[i] <- mk_test_MAM7$p.value[1]
-  # if(mk_test_MAM7$estimates[3] < 0)
-  #   huc040500MI_ws$tau_MAM7[i] <- "-"
-  # if(mk_test_MAM7$estimates[3] > 0)
-  #   huc040500MI_ws$tau_MAM7[i] <- "+"
-  # huc040500MI_ws$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
-  # if(mk_test_Baseflow$estimates[3] < 0)
-  #   huc040500MI_ws$tau_Baseflow[i] <- "-"
-  # if(mk_test_Baseflow$estimates[3] > 0)
-  #   huc040500MI_ws$tau_Baseflow[i] <- "+"
-  # huc040500MI_ws$p_MeanQ[i] <- mk_test_MeanQ$p.value[1]
-  # if(mk_test_MeanQ$estimates[3] < 0)
-  #   huc040500MI_ws$tau_MeanQ[i] <- "-"
-  # if(mk_test_MeanQ$estimates[3] > 0)
-  #   huc040500MI_ws$tau_MeanQ[i] <- "+"
-  # huc040500MI_ws$p_Q10[i] <- mk_test_Q10$p.value[1]
-  # if(mk_test_Q10$estimates[3] < 0)
-  #   huc040500MI_ws$tau_Q10[i] <- "-"
-  # if(mk_test_Q10$estimates[3] > 0)
-  #   huc040500MI_ws$tau_Q10[i] <- "+"
-  # huc040500MI_ws$p_Q50[i] <- mk_test_Q50$p.value[1]
-  # if(mk_test_Q50$estimates[3] < 0)
-  #   huc040500MI_ws$tau_Q50[i] <- "-"
-  # if(mk_test_Q50$estimates[3] > 0)
-  #   huc040500MI_ws$tau_Q50[i] <- "+"
-  # huc040500MI_ws$p_Q90[i] <- mk_test_Q90$p.value[1]
-  # if(mk_test_Q90$estimates[3] < 0)
-  #   huc040500MI_ws$tau_Q90[i] <- "-"
-  # if(mk_test_Q90$estimates[3] > 0)
-  #   huc040500MI_ws$tau_Q90[i] <- "+"
-  # huc040500MI_ws$p_Q95[i] <- mk_test_Q95$p.value[1]
-  # if(mk_test_Q95$estimates[3] < 0)
-  #   huc040500MI_ws$tau_Q95[i] <- "-"
-  # if(mk_test_Q95$estimates[3] > 0)
-  #   huc040500MI_ws$tau_Q95[i] <- "+"
+  huc040500MI_ws$p_MAM7[i] <- mk_test_MAM7$p.value[1]
+  if(mk_test_MAM7$estimates[3] < 0)
+    huc040500MI_ws$tau_MAM7[i] <- "-"
+  if(mk_test_MAM7$estimates[3] > 0)
+    huc040500MI_ws$tau_MAM7[i] <- "+"
+  huc040500MI_ws$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
+  if(mk_test_Baseflow$estimates[3] < 0)
+    huc040500MI_ws$tau_Baseflow[i] <- "-"
+  if(mk_test_Baseflow$estimates[3] > 0)
+    huc040500MI_ws$tau_Baseflow[i] <- "+"
+  huc040500MI_ws$p_MeanQ[i] <- mk_test_MeanQ$p.value[1]
+  if(mk_test_MeanQ$estimates[3] < 0)
+    huc040500MI_ws$tau_MeanQ[i] <- "-"
+  if(mk_test_MeanQ$estimates[3] > 0)
+    huc040500MI_ws$tau_MeanQ[i] <- "+"
+  huc040500MI_ws$p_Q10[i] <- mk_test_Q10$p.value[1]
+  if(mk_test_Q10$estimates[3] < 0)
+    huc040500MI_ws$tau_Q10[i] <- "-"
+  if(mk_test_Q10$estimates[3] > 0)
+    huc040500MI_ws$tau_Q10[i] <- "+"
+  huc040500MI_ws$p_Q50[i] <- mk_test_Q50$p.value[1]
+  if(mk_test_Q50$estimates[3] < 0)
+    huc040500MI_ws$tau_Q50[i] <- "-"
+  if(mk_test_Q50$estimates[3] > 0)
+    huc040500MI_ws$tau_Q50[i] <- "+"
+  huc040500MI_ws$p_Q90[i] <- mk_test_Q90$p.value[1]
+  if(mk_test_Q90$estimates[3] < 0)
+    huc040500MI_ws$tau_Q90[i] <- "-"
+  if(mk_test_Q90$estimates[3] > 0)
+    huc040500MI_ws$tau_Q90[i] <- "+"
+  huc040500MI_ws$p_Q95[i] <- mk_test_Q95$p.value[1]
+  if(mk_test_Q95$estimates[3] < 0)
+    huc040500MI_ws$tau_Q95[i] <- "-"
+  if(mk_test_Q95$estimates[3] > 0)
+    huc040500MI_ws$tau_Q95[i] <- "+"
   
   # huc110300KS_ws$p_MAM7[i] <- mk_test_MAM7$p.value[1]
   # if(mk_test_MAM7$estimates[3] < 0)
@@ -218,42 +218,48 @@ for (i in 1:nrow(huc180102CA_ws)) {
   #   huc110300KS_ws$tau_Q95[i] <- "-"
   # if(mk_test_Q95$estimates[3] > 0)
   #   huc110300KS_ws$tau_Q95[i] <- "+"
+
+  # huc180102CA_ws$p_MAM7[i] <- mk_test_MAM7$p.value[1]
+  # if(mk_test_MAM7$estimates[3] < 0)
+  #   huc180102CA_ws$tau_MAM7[i] <- "-"
+  # if(mk_test_MAM7$estimates[3] > 0)
+  #   huc180102CA_ws$tau_MAM7[i] <- "+"
+  # huc180102CA_ws$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
+  # if(mk_test_Baseflow$estimates[3] < 0)
+  #   huc180102CA_ws$tau_Baseflow[i] <- "-"
+  # if(mk_test_Baseflow$estimates[3] > 0)
+  #   huc180102CA_ws$tau_Baseflow[i] <- "+"
+  # huc180102CA_ws$p_MeanQ[i] <- mk_test_MeanQ$p.value[1]
+  # if(mk_test_MeanQ$estimates[3] < 0)
+  #   huc180102CA_ws$tau_MeanQ[i] <- "-"
+  # if(mk_test_MeanQ$estimates[3] > 0)
+  #   huc180102CA_ws$tau_MeanQ[i] <- "+"
+  # huc180102CA_ws$p_Q10[i] <- mk_test_Q10$p.value[1]
+  # if(mk_test_Q10$estimates[3] < 0)
+  #   huc180102CA_ws$tau_Q10[i] <- "-"
+  # if(mk_test_Q10$estimates[3] > 0)
+  #   huc180102CA_ws$tau_Q10[i] <- "+"
+  # huc180102CA_ws$p_Q50[i] <- mk_test_Q50$p.value[1]
+  # if(mk_test_Q50$estimates[3] < 0)
+  #   huc180102CA_ws$tau_Q50[i] <- "-"
+  # if(mk_test_Q50$estimates[3] > 0)
+  #   huc180102CA_ws$tau_Q50[i] <- "+"
+  # huc180102CA_ws$p_Q90[i] <- mk_test_Q90$p.value[1]
+  # if(mk_test_Q90$estimates[3] < 0)
+  #   huc180102CA_ws$tau_Q90[i] <- "-"
+  # if(mk_test_Q90$estimates[3] > 0)
+  #   huc180102CA_ws$tau_Q90[i] <- "+"
+  # huc180102CA_ws$p_Q95[i] <- mk_test_Q95$p.value[1]
+  # if(mk_test_Q95$estimates[3] < 0)
+  #   huc180102CA_ws$tau_Q95[i] <- "-"
+  # if(mk_test_Q95$estimates[3] > 0)
+  #   huc180102CA_ws$tau_Q95[i] <- "+"
   
-  huc180102CA_ws$p_MAM7[i] <- mk_test_MAM7$p.value[1]
-  if(mk_test_MAM7$estimates[3] < 0)
-    huc180102CA_ws$tau_MAM7[i] <- "-"
-  if(mk_test_MAM7$estimates[3] > 0)
-    huc180102CA_ws$tau_MAM7[i] <- "+"
-  huc180102CA_ws$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
-  if(mk_test_Baseflow$estimates[3] < 0)
-    huc180102CA_ws$tau_Baseflow[i] <- "-"
-  if(mk_test_Baseflow$estimates[3] > 0)
-    huc180102CA_ws$tau_Baseflow[i] <- "+"
-  huc180102CA_ws$p_MeanQ[i] <- mk_test_MeanQ$p.value[1]
-  if(mk_test_MeanQ$estimates[3] < 0)
-    huc180102CA_ws$tau_MeanQ[i] <- "-"
-  if(mk_test_MeanQ$estimates[3] > 0)
-    huc180102CA_ws$tau_MeanQ[i] <- "+"
-  huc180102CA_ws$p_Q10[i] <- mk_test_Q10$p.value[1]
-  if(mk_test_Q10$estimates[3] < 0)
-    huc180102CA_ws$tau_Q10[i] <- "-"
-  if(mk_test_Q10$estimates[3] > 0)
-    huc180102CA_ws$tau_Q10[i] <- "+"
-  huc180102CA_ws$p_Q50[i] <- mk_test_Q50$p.value[1]
-  if(mk_test_Q50$estimates[3] < 0)
-    huc180102CA_ws$tau_Q50[i] <- "-"
-  if(mk_test_Q50$estimates[3] > 0)
-    huc180102CA_ws$tau_Q50[i] <- "+"
-  huc180102CA_ws$p_Q90[i] <- mk_test_Q90$p.value[1]
-  if(mk_test_Q90$estimates[3] < 0)
-    huc180102CA_ws$tau_Q90[i] <- "-"
-  if(mk_test_Q90$estimates[3] > 0)
-    huc180102CA_ws$tau_Q90[i] <- "+"
-  huc180102CA_ws$p_Q95[i] <- mk_test_Q95$p.value[1]
-  if(mk_test_Q95$estimates[3] < 0)
-    huc180102CA_ws$tau_Q95[i] <- "-"
-  if(mk_test_Q95$estimates[3] > 0)
-    huc180102CA_ws$tau_Q95[i] <- "+"
+  ## SAVE CSV of streamgage metrics, CHOOSE watershed before running for loop --> in the future these should write to SQL database
+  write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_MI/MI_", i, "_metrics.csv"))
+  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_KS/KS_", i, "_metrics.csv"))
+  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_CA/CA_", i, "_metrics.csv"))
+
   
 }
   
@@ -289,18 +295,20 @@ for (i in 1:nrow(huc180102CA_ws)) {
   # Sys.sleep(5)
   dev.off()
   
-  ## SAVE CSV of streamgage metrics, CHOOSE watershed before running for loop --> in the future these should write to SQL database
-  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_MI/MI_", i, "_metrics.csv"))
-  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_KS/KS_", i, "_metrics.csv"))
-  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_CA/CA_", i, "_metrics.csv"))
+  
   
 }
 
 
 ## SAVE resulting watershed object 
-huc040500MI_ws_long <- huc040500MI_ws
+huc040500MI_ws_1962_2021_sel <- huc040500MI_ws
 huc110300KS_ws_long <- huc110300KS_ws
-huc180102CA_ws_long <- huc180102CA_ws
+huc180102CA_ws_1962_2021_sel <- huc180102CA_ws
+
+## SAVE CSV of watershed data, CHOOSE watershed before running for loop
+write.csv(huc040500MI_ws, "~/GradSchool/DiscoverStreams/outputs/watershed_info/huc040500MI_ws_1961-2021.csv")
+write.csv(huc110300KS_ws, "~/GradSchool/DiscoverStreams/outputs/watershed_info/huc110300KS_ws_long.csv")
+write.csv(huc180102CA_ws,"~/GradSchool/DiscoverStreams/outputs/watershed_info/huc180102CA_ws_1964-2021.csv")
 
 ## SAVE resulting streamflow metrics to dataframe
 huc040500MI_sfmetrics_long <- sf_metrics

@@ -37,8 +37,8 @@ con_KS <- dbConnect(odbc(),
 ## Run once, NEED to change parameters for NWIS streamflow data retrieval from NWIS
 parameter_code <- c("00060")
 parameter_names <- c("Discharge, cubic feet per second")
-start_date <- ""    
-end_date <- ""
+start_date <- "1962-10-01"    
+end_date <- "2021-09-30"
 
 
 ### WATERSHED STATION INFO - all gage stations within each watershed ###
@@ -61,12 +61,12 @@ huc180102CA <- data.frame()
 site_select <- data.frame()
 
 ## CHANGE HUC08 name then RUN for loop
-# for (i in seq_along(huc040500MI_NWISsites)) {
-#   site_number <- huc040500MI_NWISsites[i]
+for (i in seq_along(huc040500MI_NWISsites)) {
+  site_number <- huc040500MI_NWISsites[i]
   # for (i in seq_along(huc110300KS_NWISsites)) {
   #         site_number <- huc110300KS_NWISsites[i]
-  for (i in seq_along(huc180102CA_NWISsites)) {
-          site_number <- huc180102CA_NWISsites[i]
+  # for (i in seq_along(huc180102CA_NWISsites)) {
+  #         site_number <- huc180102CA_NWISsites[i]
   
   site_info <- dataRetrieval::readNWISsite(site_number)
   # keep columns 2, 3, 7, 8, 24
@@ -90,22 +90,22 @@ site_select <- data.frame()
   site_select <- rbind(site_select, site_info)
   site_select <- site_select[!duplicated(site_select), ]
   site_select <- subset(site_select, yearsAvail >= 30, select = c(1:8))
-  if(count(raw_daily$X_00060_00003==NA))
   # site_select <- subset(site_select, yearsAvail >= 100, select = c(1:8))
   
   ## APPEND HUC06 site selected to corresponding HUC06 data frame, CHOOSE HUC06 by commenting out other HUC06 watersheds
-  # huc040500MI <- rbind(huc040500MI, site_select)
-  # huc040500MI <- huc040500MI[!duplicated(huc040500MI), ]
+  huc040500MI <- rbind(huc040500MI, site_select)
+  huc040500MI <- huc040500MI[!duplicated(huc040500MI), ]
   # huc110300KS <- rbind(huc110300KS, site_select)
   # huc110300KS <- huc110300KS[!duplicated(huc110300KS), ]
-  huc180102CA <- rbind(huc180102CA, site_select)
-  huc180102CA <- huc180102CA[!duplicated(huc180102CA), ]
+  # huc180102CA <- rbind(huc180102CA, site_select)
+  # huc180102CA <- huc180102CA[!duplicated(huc180102CA), ]
 
 }
 
+
 ## SUBSET by start and end dates
-huc040500MI_ws_1962_sel <- subset(huc040500MI_ws, startDate == "1962-10-01", select = c(1:8))
-huc040500MI_ws_1962_2021_sel <- subset(huc040500MI_ws_1962_sel, endDate == "2021-09-30", select = c(1:8))
+huc040500MI_ws <- subset(huc040500MI, startDate == "1962-10-01", select = c(1:8))
+huc040500MI_ws <- subset(huc040500MI_ws, endDate == "2021-09-30", select = c(1:8))
 huc110300KS_ws_1962_sel <- subset(huc110300KS_ws, startDate == "1962-10-01", select = c(1:8))
 huc110300KS_ws_1962_2021_sel <- subset(huc110300KS_ws_1962_sel, endDate == "2021-09-30", select = c(1:8))
 huc180102CA_ws_1962_sel <- subset(huc180102CA_ws, startDate == "1962-10-01", select = c(1:8))
@@ -120,9 +120,9 @@ huc180102CA_ws_ep <- subset(huc180102CA_ws_1962_sel, endDate == "2021-09-30", se
 
 
 ## CREATE/SAVE watershed object to work with and RESET as needed without re-running for loops
-huc040500MI_ws <- huc040500MI_ws_long
-huc110300KS_ws <- huc110300KS_ws_long
-huc180102CA_ws <- huc180102CA_ws_long
+huc040500MI_ws_1962_2021_sel <- huc040500MI_ws
+huc110300KS_ws_1962_2021_sel <- huc110300KS_ws
+huc180102CA_ws_1962_2021_sel <- huc180102CA_ws
 
 
 ## optional WRITE watershed site information to CSV for use with GIS and webGIS
