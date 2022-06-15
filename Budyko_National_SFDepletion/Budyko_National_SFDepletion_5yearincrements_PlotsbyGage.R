@@ -86,11 +86,14 @@ BudykoDF <- read.csv("BudykoParameters.csv")
 setwd(paste0(projectPath,"Data"))
 gagedetails <- read.csv("gage_characteristics.csv", stringsAsFactors = FALSE, colClasses=c("site_id"="character") )
 
+#initialize matrix for summary of Budyko fits
+allfits <- matrix(data=NA, nrow=0, ncol=6)
+colnames(allfits) <- c("siteid", "basintype", "param", "mae", "rsq", "hs")
 
 
 for(i in seq_along(SiteIds)){
   
-  i = 1
+  #i = 1
   setwd(paste0(projectPath,"Data//Daily_Data"))
   
   #Prep streamflow data
@@ -123,7 +126,6 @@ for(i in seq_along(SiteIds)){
   current$interval <- round_any(current$year, 5, f=floor)
   meanSF <- current %>% group_by(interval) %>% summarise(meanSF = mean(mmd))
   
-  
   #Prep MET data
   current_P <- gridmet_P_mm[,c("Date",currentsite_string)]
   current_P$Date <- as.Date(current_P$Date, origin = "1899-12-30")
@@ -148,7 +150,6 @@ for(i in seq_along(SiteIds)){
   fluxes <- merge(fluxes, meanSF, by = "interval")
   fluxes$siteID <- currentsite
   fluxes$group <- currentgroup
-  
   fluxes$PET.P = fluxes$meanPET / fluxes$meanP
   fluxes$AET.P = (1 - fluxes$meanSF / fluxes$meanP)
   
@@ -157,32 +158,49 @@ for(i in seq_along(SiteIds)){
   #custom fit the data
   fit1=budyko_fit(data=fluxes,method="Fu",dif="mae",silent = TRUE)
   
-  #fit1
+  fit1
+  typeof(fit1)
+  fit <- matrix(unlist(fit1), ncol=4, nrow=1)
+  fit <- cbind(c(currentgroup), fit)
+  fit <- cbind(c(currentsite),fit)
+  colnames(fit) <- c("siteid", "basintype", "param", "mae", "rsq", "hs")
   
   sim1=budyko_sim(fit=fit1, method="Fu")
   
-  blankBC+
+  plot <- blankBC+
     geom_line(data=sim1)+
-    geom_point(data=fluxes, aes(colour = group))+
+    geom_point(data=fluxes, aes(colour = interval), size=1)+
+    scale_color_gradient(low="dark blue", high="orange")+
+    #scale_color_gradientn(colours = rainbow(5))+
+    #scale_color_gradient2(midpoint=1980, low="dark blue", mid="grey", high="red")+
     theme(panel.background = element_blank(), 
           panel.grid = element_blank(),
           panel.border = element_rect(fill  = NA),
           plot.title = element_text(hjust = 0.5),
-          legend.position = c(0.8,0.2)) + 
-    coord_cartesian(xlim=c(0,3), ylim=c(0.4,1))
+          legend.position = c(0.8,0.3)) + 
+    coord_cartesian(xlim=c(0,3), ylim=c(0.4,1))+
+    labs(title=paste0(currentsite," (",currentgroup,")")) 
+    #annotate("text", x=2.5, y=0.7, label = paste0(fit1)) 
+  
+  #plot
+  plotfilesave <- paste0(currentsite,"_Budyko_5yearincrmt.jpg")
+  setwd(paste0(projectPath,"Plots"))
+  ggsave(plot=plot, file=plotfilesave, dpi=600, width=4, height=4)
   
   
-  
+
   #head(fluxes)
   #head(BudykoDF)
   
-  #BudykoDF <- rbind(BudykoDF, fluxes )
+  BudykoDF <- rbind(BudykoDF, fluxes )
+  allfits <- rbind(allfits, fit)
   
 }
 
 setwd(paste0(projectPath,"Data"))
 
 try(write.csv(BudykoDF, file="BudykoParameters.csv"))
+try(write.csv(allfits, file="BudykoFitSummary.csv"))
 
 BudykoDF <- subset(BudykoDF, (BudykoDF$group == "Reference" |BudykoDF$group ==  "Impacted"))
 BudykoReference <- subset(BudykoDF, (BudykoDF$group == "Reference"))
