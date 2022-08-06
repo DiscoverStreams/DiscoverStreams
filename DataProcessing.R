@@ -32,7 +32,7 @@ huc040500MI_ws$id <- 1:nrow(huc040500MI_ws)
 huc110300KS_ws$id <- 1:nrow(huc110300KS_ws)
 huc180102CA_ws$id <- 1:nrow(huc180102CA_ws)
 
-## ADD columns for p and tau values for each station from Mann-Kendall Test on MAM7
+## ADD columns for entire record calculation, p, and tau values for each station from Mann-Kendall Test on MAM7
 huc040500MI_ws$p_MAM7 <- NA
 huc040500MI_ws$tau_MAM7 <- NA
 huc110300KS_ws$p_MAM7 <- NA
@@ -40,7 +40,7 @@ huc110300KS_ws$tau_MAM7 <- NA
 huc180102CA_ws$p_MAM7 <- NA
 huc180102CA_ws$tau_MAM7 <- NA
 
-## ADD columns for p and tau values for each station from Mann-Kendall Test on Mean Baseflow
+## ADD columns for entire record calculation, p, and tau values for each station from Mann-Kendall Test on Mean Baseflow
 huc040500MI_ws$p_Baseflow <- NA
 huc040500MI_ws$tau_Baseflow <- NA
 huc110300KS_ws$p_Baseflow <- NA
@@ -48,7 +48,7 @@ huc110300KS_ws$tau_Baseflow <- NA
 huc180102CA_ws$p_Baseflow <- NA
 huc180102CA_ws$tau_Baseflow <- NA
 
-## ADD columns for p and tau values for each station from Mann-Kendall Test on Mean Discharge (Q)
+## ADD columns for entire record calculation, p, and tau values for each station from Mann-Kendall Test on Mean Discharge (Q)
 huc040500MI_ws$p_MeanQ <- NA
 huc040500MI_ws$tau_MeanQ <- NA
 huc110300KS_ws$p_MeanQ <- NA
@@ -56,7 +56,7 @@ huc110300KS_ws$tau_MeanQ <- NA
 huc180102CA_ws$p_MeanQ <- NA
 huc180102CA_ws$tau_MeanQ <- NA
 
-## ADD columns for p and tau values for each station from Mann-Kendall Test on Q10
+## ADD columns for entire record calculation, p, and tau values for each station from Mann-Kendall Test on Q10
 huc040500MI_ws$p_Q10 <- NA
 huc040500MI_ws$tau_Q10 <- NA
 huc110300KS_ws$p_Q10 <- NA
@@ -64,7 +64,7 @@ huc110300KS_ws$tau_Q10 <- NA
 huc180102CA_ws$p_Q10 <- NA
 huc180102CA_ws$tau_Q10 <- NA
 
-## ADD columns for p and tau values for each station from Mann-Kendall Test on Q50
+## ADD columns for entire record calculation, p, and tau values for each station from Mann-Kendall Test on Q50
 huc040500MI_ws$p_Q50 <- NA
 huc040500MI_ws$tau_Q50 <- NA
 huc110300KS_ws$p_Q50 <- NA
@@ -72,7 +72,7 @@ huc110300KS_ws$tau_Q50 <- NA
 huc180102CA_ws$p_Q50 <- NA
 huc180102CA_ws$tau_Q50 <- NA
 
-## ADD columns for p and tau values for each station from Mann-Kendall Test on Q90
+## ADD columns for entire record calculation, p, and tau values for each station from Mann-Kendall Test on Q90
 huc040500MI_ws$p_Q90 <- NA
 huc040500MI_ws$tau_Q90 <- NA
 huc110300KS_ws$p_Q90 <- NA
@@ -80,7 +80,7 @@ huc110300KS_ws$tau_Q90 <- NA
 huc180102CA_ws$p_Q90 <- NA
 huc180102CA_ws$tau_Q90 <- NA
 
-## ADD columns for p and tau values for each station from Mann-Kendall Test on Q95
+## ADD columns for entire record calculation, p, and tau values for each station from Mann-Kendall Test on Q95
 huc040500MI_ws$p_Q95 <- NA
 huc040500MI_ws$tau_Q95 <- NA
 huc110300KS_ws$p_Q95 <- NA

@@ -111,8 +111,12 @@ huc040500MI_SPEI12_melt <- reshape2::melt(huc040500MI_SPEI12, measure.vars = 2:n
     
 p_huc040500MI_SPEI12_melt <- ggplot2::ggplot(huc040500MI_SPEI12_melt, aes(x = DATE, y = SPEI, group = Watershed, color = Watershed)) +
   geom_line() +
+  geom_vline(xintercept = as.Date("1960-01-01"), color = "black", size = 2) +
+  geom_hline(yintercept = 0, color = "black", size = 1) +
   scale_color_manual(values = c("darkorchid", "deepskyblue2", "turquoise3", "chartreuse3", "goldenrod1", "darkorange1", "red3")) +
-  scale_x_date(limits = as.Date(c("1955-10-01", "1965-10-01")))
+  scale_x_date(limits = as.Date(c("1955-10-01", "1965-10-01"))) +
+  scale_y_continuous(breaks = c(-2, -1, 0, 1, 2), labels = c(-2, -1, 0, 1, 2)) +
+  theme(axis.title.x = element_text(size = 26), axis.title.y = element_text(size = 26), axis.text = element_text(size = 28), legend.text = element_text(size = 18), legend.title = element_text(size = 18))
 p_huc040500MI_SPEI12_melt 
 
 ## SELECT watersheds specific to high-density gage stations of interest, ** MI has all watersheds represented by a gage station
@@ -123,8 +127,12 @@ huc110300KS_SPEI12_hd_melt$DATE <- as.Date(huc110300KS_SPEI12_hd_melt$DATE)
 
 p_huc110300KS_SPEI12_melt <- ggplot2::ggplot(huc110300KS_SPEI12_hd_melt, aes(x = DATE, y = SPEI, group = Watershed, color = Watershed)) +
   geom_line() +
+  geom_vline(xintercept = as.Date("1963-01-01"), color = "black", size = 2) +
+  geom_hline(yintercept = 0, color = "black", size = 1) +
   scale_color_manual(values = c("darkorchid", "violet", "blue", "deepskyblue2", "turquoise3", "springgreen4", "chartreuse2", "yellow", "goldenrod1", "orange", "darkorange1", "red3")) +
-  scale_x_date(limits = as.Date(c("1955-10-01", "1965-10-01")))
+  scale_x_date(limits = as.Date(c("1955-10-01", "1965-10-01"))) +
+  scale_y_continuous(breaks = c(-2, -1, 0, 1, 2), labels = c(-2, -1, 0, 1, 2)) +
+  theme(axis.title.x = element_text(size = 26), axis.title.y = element_text(size = 26), axis.text = element_text(size = 28), legend.text = element_text(size = 18), legend.title = element_text(size = 18))
 p_huc110300KS_SPEI12_melt
 
 ## SELECT watersheds specific to high-density gage stations of interest, ** MI has all watersheds represented by a gage station
@@ -134,8 +142,12 @@ huc180102CA_SPEI12_hd_melt$DATE <- as.Date(huc180102CA_SPEI12_hd_melt$DATE)
 
 p_huc180102CA_SPEI12_melt <- ggplot2::ggplot(huc180102CA_SPEI12_hd_melt, aes(x = DATE, y = SPEI, group = Watershed, color = Watershed)) +
   geom_line() +
+  geom_vline(xintercept = as.Date("1962-01-01"), color = "black", size = 2) +
+  geom_hline(yintercept = 0, color = "black", size = 1) +
   scale_color_manual(values = c("darkorchid", "violet", "blue", "deepskyblue2", "turquoise3",  "chartreuse2", "goldenrod1", "orange", "red3")) +
-  scale_x_date(limits = as.Date(c("1955-10-01", "1965-10-01")))
+  scale_x_date(limits = as.Date(c("1955-10-01", "1965-10-01"))) +
+  scale_y_continuous(breaks = c(-2, -1, 0, 1, 2), labels = c(-2, -1, 0, 1, 2)) +
+  theme(axis.title.x = element_text(size = 26), axis.title.y = element_text(size = 26), axis.text = element_text(size = 28), legend.text = element_text(size = 18), legend.title = element_text(size = 18))
 p_huc180102CA_SPEI12_melt
 
   

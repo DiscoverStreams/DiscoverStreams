@@ -27,6 +27,33 @@ us_states <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documen
     ## join the attribute table from the spatial object to the new data frame
     us_states_df <- left_join(us_states_df, us_states@data, by = "id")
 
+## IMPORT MI state boundaries
+    MI_stateBoundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/MI/MI_StateBoundaries.geojson")
+    ## convert spatial object to a ggplot ready data frame
+    MI_stateBoundary_df <- tidy(MI_stateBoundary)
+    ## make sure the shapefile attribute table has an id column
+    MI_stateBoundary$id <- rownames(MI_stateBoundary@data)
+    ## join the attribute table from the spatial object to the new data frame
+    MI_stateBoundary_df <- left_join(MI_stateBoundary_df, MI_stateBoundary@data, by = "id")
+    
+## IMPORT KS state boundaries
+    KS_stateBoundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/KS/KS_StateBoundaries.geojson")
+    ## convert spatial object to a ggplot ready data frame
+    KS_stateBoundary_df <- tidy(KS_stateBoundary)
+    ## make sure the shapefile attribute table has an id column
+    KS_stateBoundary$id <- rownames(KS_stateBoundary@data)
+    ## join the attribute table from the spatial object to the new data frame
+    KS_stateBoundary_df <- left_join(KS_stateBoundary_df, KS_stateBoundary@data, by = "id")
+
+## IMPORT CA state boundaries
+    CA_stateBoundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/CA/CA_StateBoundaries.geojson")
+    ## convert spatial object to a ggplot ready data frame
+    CA_stateBoundary_df <- tidy(CA_stateBoundary)
+    ## make sure the shapefile attribute table has an id column
+    CA_stateBoundary$id <- rownames(CA_stateBoundary@data)
+    ## join the attribute table from the spatial object to the new data frame
+    CA_stateBoundary_df <- left_join(CA_stateBoundary_df, CA_stateBoundary@data, by = "id")
+    
 ## IMPORT US rivers
 us_rivers <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/Lakes_and_Rivers_Shapefile/NA_Lakes_and_Rivers/data/hydrography_l_rivers_v2_contiguous.shp")
     ## convert spatial object to a ggplot ready data frame
@@ -35,6 +62,33 @@ us_rivers <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documen
     us_rivers$id <- rownames(us_rivers@data)
     ## join the attribute table from the spatial object to the new data frame
     us_rivers_df <- left_join(us_rivers_df, us_rivers@data, by = "id")
+    
+## IMPORT US rivers clipped to MI view - ArcGIS source
+    MI_rivers <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/MI/MI_Rivers_and_Streams.geojson")
+    ## convert spatial object to a ggplot ready data frame
+    MI_rivers_df <- tidy(MI_rivers)
+    ## make sure the shapefile attribute table has an id column
+    MI_rivers$id <- rownames(MI_rivers@data)
+    ## join the attribute table from the spatial object to the new data frame
+    MI_rivers_df <- left_join(MI_rivers_df, MI_rivers@data, by = "id")
+    
+## IMPORT US rivers clipped to KS view - ArcGIS source
+    KS_rivers <- readOGR("C:/Users/Misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/KS/KS_Rivers_and_Streams.geojson")
+    ## convert spatial object to a ggplot ready data frame
+    KS_rivers_df <- tidy(KS_rivers)
+    ## make sure the shapefile attribute table has an id column
+    KS_rivers$id <- rownames(KS_rivers@data)
+    ## join the attribute table from the spatial object to the new data frame
+    KS_rivers_df <- left_join(KS_rivers_df, KS_rivers@data, by = "id")
+    
+## IMPORT US rivers clipped to CA view - ArcGIS source
+    CA_rivers <- readOGR("C:/Users/Misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/CA/CA_Rivers_and_Streams.geojson")
+    ## convert spatial object to a ggplot ready data frame
+    CA_rivers_df <- tidy(CA_rivers)
+    ## make sure the shapefile attribute table has an id column
+    CA_rivers$id <- rownames(CA_rivers@data)
+    ## join the attribute table from the spatial object to the new data frame
+    CA_rivers_df <- left_join(CA_rivers_df, CA_rivers@data, by = "id")
 
 ## IMPORT St. Joseph watershed boundary
 SELakeMI_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Shapefiles/MI/040500MI_WSboundary.geojson")
@@ -64,24 +118,57 @@ Klamath_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kans
     ## join the attribute table from the spatial object to the new data frame
     Klamath_WS_boundary_df <- left_join(Klamath_WS_boundary_df, Klamath_WS_boundary@data, by = "id")
 
-    
-# # quick plot using base plot
-# plot(us_states,
-#      main = "United States (contiguous)")
+### FUNCTIONS FOR PLOTTING ###   
+    id.number <- function(n){
+      # if(n == 1){return(huc040500MI_ws[n, ])}
+      if(n == 1){return(huc110300KS_ws[n, ])}
+      # if(n == 1){return(huc180102CA_ws[n, ])}
+    }
 
 
-### PLOT MAP ###
+### WATERSHED SITE MAP ###
 
 ggplot() +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) +
-  geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") 
+  geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
   # geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5 ) +
+  geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), color = "black", fill = "white", alpha = 0) +
   # geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5 ) +
   # geom_point(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va), fill = "plum4") +
-  # geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va), fill = "tan4") +
+  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "white", size = 4) 
   # geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va), fill = "springgreen4")
 
+
+### ISOLATE GAGE STATION MAP ###
+
+ggplot() +
+  geom_path(data = MI_stateBoundary_df, aes(x = long, y = lat, group = group), size = 1) +
+  geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
+  geom_path(data = MI_rivers_df, aes(x = long, y = lat, group = group, color = ), color = "royalblue2") +
+  geom_point(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va), color = "white",  size = 4) +
+  geom_point(data = sapply(huc040500MI_ws$id, id.number)[[1]], aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "black", size = 7) 
+  
+
+ggplot() +
+  geom_path(data = KS_stateBoundary_df, aes(x = long, y = lat, group = group), size = 1) +
+  geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "white", color = "black", alpha = 0, size = 1.5) +
+  geom_path(data = KS_rivers_df, aes(x = long, y = lat, group = group, alpha = Feature), color = "royalblue2") +
+  scale_alpha_manual(values = c(0, 0, 0, 1, 0)) +
+  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va), fill = "white", color = "black", shape = 21 , size = 4) +
+  geom_point(data = sapply(huc110300KS_ws$id, id.number)[[1]], aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "black", size = 7) +
+  theme(legend.position = "none")
+
+
+ggplot() +
+  geom_path(data = CA_stateBoundary_df, aes(x = long, y = lat, group = group), size = 1) +
+  geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
+  geom_path(data = CA_rivers_df, aes(x = long, y = lat, group = group, color = ), color = "royalblue2") +
+  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va), color = "white",  size = 4) +
+  geom_point(data = sapply(huc180102CA_ws$id, id.number)[[1]], aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "black", size = 7)
+  
+  
+### FUNCTIONS FOR DATA-DRIVEN FORMATTING ###
 color.picker <- function(t){
   if(t == "+"){return("darkblue")}
   else {return("darkred")}
@@ -103,6 +190,8 @@ alpha.picker <- function(z){
   if(z <= 0.05){return(0.1)}
   else {return(1)}
 }
+
+
 
 ##### PLOT MK test for MAM7
 MI_mk_MAM7_map <- ggplot() +
