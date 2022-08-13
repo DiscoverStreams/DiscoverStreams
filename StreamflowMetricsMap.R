@@ -120,14 +120,29 @@ Klamath_WS_boundary <- readOGR("C:/Users/misty/OneDrive - The University of Kans
 
 ### FUNCTIONS FOR PLOTTING ###   
     id.number <- function(n){
-      # if(n == 1){return(huc040500MI_ws[n, ])}
-      if(n == 1){return(huc110300KS_ws[n, ])}
-      # if(n == 1){return(huc180102CA_ws[n, ])}
+      # if(n == 1){return(ws_040500MI[n, ])}
+      if(n == 1){return(ws_110300KS[n, ])}
+      # if(n == 1){return(ws_180102CA[n, ])}
     }
 
 
-### WATERSHED SITE MAP ###
 
+## SET watershed object to work with based on time period
+ws_040500MI <- ws_040500MI_hd
+ws_110300KS <- ws_110300KS_hd
+ws_180102CA <- ws_180102CA_hd
+
+ws_040500MI <- ws_040500MI_long
+ws_110300KS <- ws_110300KS_long
+ws_180102CA <- ws_180102CA_long
+
+ws_040500MI <- ws_040500MI_ep
+ws_110300KS <- ws_110300KS_ep
+ws_180102CA <- ws_180102CA_ep
+  
+  
+    
+### WATERSHED SITE MAP ###  
 ggplot() +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) +
   geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
@@ -135,9 +150,9 @@ ggplot() +
   # geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5 ) +
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), color = "black", fill = "white", alpha = 0) +
   # geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5 ) +
-  # geom_point(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va), fill = "plum4") +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "white", size = 4) 
-  # geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va), fill = "springgreen4")
+  # geom_point(data = ws_040500MI, aes(x = dec_long_va, y = dec_lat_va), fill = "plum4") +
+  geom_point(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "white", size = 4) 
+  # geom_point(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va), fill = "springgreen4")
 
 
 ### ISOLATE GAGE STATION MAP ###
@@ -146,8 +161,8 @@ ggplot() +
   geom_path(data = MI_stateBoundary_df, aes(x = long, y = lat, group = group), size = 1) +
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
   geom_path(data = MI_rivers_df, aes(x = long, y = lat, group = group, color = ), color = "royalblue2") +
-  geom_point(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va), color = "white",  size = 4) +
-  geom_point(data = sapply(huc040500MI_ws$id, id.number)[[1]], aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "black", size = 7) 
+  geom_point(data = ws_040500MI, aes(x = dec_long_va, y = dec_lat_va), color = "white",  size = 4) +
+  geom_point(data = sapply(ws_040500MI$id, id.number)[[1]], aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "black", size = 7) 
   
 
 ggplot() +
@@ -155,8 +170,8 @@ ggplot() +
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "white", color = "black", alpha = 0, size = 1.5) +
   geom_path(data = KS_rivers_df, aes(x = long, y = lat, group = group, alpha = Feature), color = "royalblue2") +
   scale_alpha_manual(values = c(0, 0, 0, 1, 0)) +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va), fill = "white", color = "black", shape = 21 , size = 4) +
-  geom_point(data = sapply(huc110300KS_ws$id, id.number)[[1]], aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "black", size = 7) +
+  geom_point(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va), fill = "white", color = "black", shape = 21 , size = 4) +
+  geom_point(data = sapply(ws_110300KS$id, id.number)[[1]], aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "black", size = 7) +
   theme(legend.position = "none")
 
 
@@ -164,8 +179,8 @@ ggplot() +
   geom_path(data = CA_stateBoundary_df, aes(x = long, y = lat, group = group), size = 1) +
   geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
   geom_path(data = CA_rivers_df, aes(x = long, y = lat, group = group, color = ), color = "royalblue2") +
-  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va), color = "white",  size = 4) +
-  geom_point(data = sapply(huc180102CA_ws$id, id.number)[[1]], aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "black", size = 7)
+  geom_point(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va), color = "white",  size = 4) +
+  geom_point(data = sapply(ws_180102CA$id, id.number)[[1]], aes(x = dec_long_va, y = dec_lat_va), color = "black", fill = "black", size = 7)
   
   
 ### FUNCTIONS FOR DATA-DRIVEN FORMATTING ###
@@ -192,18 +207,17 @@ alpha.picker <- function(z){
 }
 
 
-
-##### PLOT MK test for MAM7
+### PLOT MK test for MAM7 ###
 MI_mk_MAM7_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
-  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_MAM7, fill = tau_MAM7, alpha = p_MAM7), size = 3) +
-  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc040500MI_ws$tau_MAM7, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_040500MI,aes(x = dec_long_va, y = dec_lat_va, shape = tau_MAM7, fill = tau_MAM7, alpha = p_MAM7), size = 3) +
+  geom_text_repel(data = ws_040500MI, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_040500MI$tau_MAM7, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc040500MI_ws$tau_MAM7, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc040500MI_ws$tau_MAM7, huc040500MI_ws$p_MAM7)) +
+  scale_fill_manual(values = sapply(ws_040500MI$tau_MAM7, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_040500MI$tau_MAM7, ws_040500MI$p_MAM7)) +
   # + xlim(-87, -83.75) + ylim(41.25, 43.5)
   ggtitle("M-K Test on Annual MAM7 for SE Lake Michigan Watershed 1901 - 2021") + 
   theme(legend.position="none")
@@ -213,12 +227,12 @@ KS_mk_MAM7_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MAM7, fill = tau_MAM7, alpha = p_MAM7), size = 3) +
-  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc110300KS_ws$tau_MAM7, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MAM7, fill = tau_MAM7, alpha = p_MAM7), size = 3) +
+  geom_text_repel(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_110300KS$tau_MAM7, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc110300KS_ws$tau_MAM7, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc110300KS_ws$tau_MAM7, huc110300KS_ws$p_MAM7)) +
+  scale_fill_manual(values = sapply(ws_110300KS$tau_MAM7, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_110300KS$tau_MAM7, ws_110300KS$p_MAM7)) +
   xlim(-103, -96.5) + ylim(36, 39.5) +
   ggtitle("M-K Test on Annual MAM7 for Middle Arkansas Watershed 1902 - 2021") +
   theme(legend.position="none")
@@ -228,12 +242,12 @@ CA_mk_MAM7_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
-  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MAM7, fill = tau_MAM7, alpha = p_MAM7), size = 3) +
-  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc180102CA_ws$tau_MAM7, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MAM7, fill = tau_MAM7, alpha = p_MAM7), size = 3) +
+  geom_text_repel(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_180102CA$tau_MAM7, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc180102CA_ws$tau_MAM7, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc180102CA_ws$tau_MAM7, huc180102CA_ws$p_MAM7)) +
+  scale_fill_manual(values = sapply(ws_180102CA$tau_MAM7, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_180102CA$tau_MAM7, ws_180102CA$p_MAM7)) +
   # + xlim(-103, -96.5) + ylim(36, 39.5)
   ggtitle("M-K Test on Annual MAM7 for Klamath Watershed 1904 - 2021") +
   theme(legend.position="none")
@@ -245,12 +259,12 @@ MI_mk_Baseflow_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
-  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Baseflow, fill = tau_Baseflow, alpha = p_Baseflow), size = 3) +
-  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc040500MI_ws$tau_Baseflow, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_040500MI,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Baseflow, fill = tau_Baseflow, alpha = p_Baseflow), size = 3) +
+  geom_text_repel(data = ws_040500MI, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_040500MI$tau_Baseflow, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc040500MI_ws$tau_Baseflow, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc040500MI_ws$tau_Baseflow, huc040500MI_ws$p_Baseflow)) +
+  scale_fill_manual(values = sapply(ws_040500MI$tau_Baseflow, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_040500MI$tau_Baseflow, ws_040500MI$p_Baseflow)) +
   # + xlim(-87, -83.75) + ylim(41.25, 43.5)
   ggtitle("M-K Test on Annual Mean Baseflow for SE Lake Michigan Watershed 1901 - 2021") + 
   theme(legend.position="none")
@@ -260,12 +274,12 @@ KS_mk_Baseflow_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Baseflow, fill = tau_Baseflow, alpha = p_Baseflow), size = 3) +
-  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc110300KS_ws$tau_Baseflow, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Baseflow, fill = tau_Baseflow, alpha = p_Baseflow), size = 3) +
+  geom_text_repel(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_110300KS$tau_Baseflow, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc110300KS_ws$tau_Baseflow, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc110300KS_ws$tau_Baseflow, huc110300KS_ws$p_Baseflow)) +
+  scale_fill_manual(values = sapply(ws_110300KS$tau_Baseflow, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_110300KS$tau_Baseflow, ws_110300KS$p_Baseflow)) +
   xlim(-103, -96.5) + ylim(36, 39.5) +
   ggtitle("M-K Test on Annual Mean Baseflow for Middle Arkansas Watershed 1902 - 2021") +
   theme(legend.position="none")
@@ -275,12 +289,12 @@ CA_mk_Baseflow_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
-  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Baseflow, fill = tau_Baseflow, alpha = p_Baseflow), size = 3) +
-  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc180102CA_ws$tau_Baseflow, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Baseflow, fill = tau_Baseflow, alpha = p_Baseflow), size = 3) +
+  geom_text_repel(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_180102CA$tau_Baseflow, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0)) +
-  scale_fill_manual(values = sapply(huc180102CA_ws$tau_Baseflow, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc180102CA_ws$tau_Baseflow, huc180102CA_ws$p_Baseflow)) +
+  scale_fill_manual(values = sapply(ws_180102CA$tau_Baseflow, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_180102CA$tau_Baseflow, ws_180102CA$p_Baseflow)) +
   # + xlim(-103, -96.5) + ylim(36, 39.5)
   ggtitle("M-K Test on Annual Mean Baseflow for Klamath Watershed 1904 - 2021") +
   theme(legend.position="none")
@@ -292,12 +306,12 @@ MI_mk_MeanQ_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
-  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_MeanQ, fill = tau_MeanQ, alpha = p_MeanQ), size = 3) +
-  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc040500MI_ws$tau_MeanQ, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_040500MI,aes(x = dec_long_va, y = dec_lat_va, shape = tau_MeanQ, fill = tau_MeanQ, alpha = p_MeanQ), size = 3) +
+  geom_text_repel(data = ws_040500MI, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_040500MI$tau_MeanQ, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc040500MI_ws$tau_MeanQ, color.picker)) +
-# scale_fill_manual(values = mapply(FUN = color.picker2, huc040500MI_ws$tau_MeanQ, huc040500MI_ws$p_MeanQ)) +
+  scale_fill_manual(values = sapply(ws_040500MI$tau_MeanQ, color.picker)) +
+# scale_fill_manual(values = mapply(FUN = color.picker2, ws_040500MI$tau_MeanQ, ws_040500MI$p_MeanQ)) +
   # + xlim(-87, -83.75) + ylim(41.25, 43.5)
   ggtitle("M-K Test on Annual Mean Discharge for SE Lake Michigan Watershed 1901 - 2021") + 
   theme(legend.position="none")
@@ -307,12 +321,12 @@ KS_mk_MeanQ_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MeanQ, fill = tau_MeanQ, alpha = p_MeanQ), size = 3) +
-  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc110300KS_ws$tau_MeanQ, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MeanQ, fill = tau_MeanQ, alpha = p_MeanQ), size = 3) +
+  geom_text_repel(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_110300KS$tau_MeanQ, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc110300KS_ws$tau_MeanQ, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc110300KS_ws$tau_MeanQ, huc110300KS_ws$p_MeanQ)) +
+  scale_fill_manual(values = sapply(ws_110300KS$tau_MeanQ, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_110300KS$tau_MeanQ, ws_110300KS$p_MeanQ)) +
   xlim(-103, -96.5) + ylim(36, 39.5) +
   ggtitle("M-K Test on Annual Mean Discharge for Middle Arkansas Watershed 1902 - 2021") +
   theme(legend.position="none")
@@ -322,12 +336,12 @@ CA_mk_MeanQ_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
-  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MeanQ, fill = tau_MeanQ, alpha = p_MeanQ), size = 3) +
-  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc180102CA_ws$tau_MeanQ, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, shape = tau_MeanQ, fill = tau_MeanQ, alpha = p_MeanQ), size = 3) +
+  geom_text_repel(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_180102CA$tau_MeanQ, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc180102CA_ws$tau_MeanQ, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc180102CA_ws$tau_MeanQ, huc180102CA_ws$p_MeanQ)) +
+  scale_fill_manual(values = sapply(ws_180102CA$tau_MeanQ, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_180102CA$tau_MeanQ, ws_180102CA$p_MeanQ)) +
   # + xlim(-103, -96.5) + ylim(36, 39.5)
   ggtitle("M-K Test on Annual Mean Discharge for Klamath Watershed 1904 - 2021") +
   theme(legend.position="none")
@@ -339,12 +353,12 @@ MI_mk_Q10_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
-  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q10, fill = tau_Q10, alpha = p_Q10), size = 3) +
-  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc040500MI_ws$tau_Q10, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_040500MI,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q10, fill = tau_Q10, alpha = p_Q10), size = 3) +
+  geom_text_repel(data = ws_040500MI, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_040500MI$tau_Q10, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc040500MI_ws$tau_Q10, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc180102CA_ws$tau_Q10, huc180102CA_ws$p_Q10)) +
+  scale_fill_manual(values = sapply(ws_040500MI$tau_Q10, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_180102CA$tau_Q10, ws_180102CA$p_Q10)) +
   # + xlim(-87, -83.75) + ylim(41.25, 43.5)
   ggtitle("M-K Test on Annual Q10 for SE Lake Michigan Watershed 1901 - 2021") + 
   theme(legend.position="none")
@@ -354,12 +368,12 @@ KS_mk_Q10_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q10, fill = tau_Q10, alpha = p_Q10), size = 3) +
-  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc110300KS_ws$tau_Q10, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q10, fill = tau_Q10, alpha = p_Q10), size = 3) +
+  geom_text_repel(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_110300KS$tau_Q10, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc110300KS_ws$tau_Q10, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc110300KS_ws$tau_Q10, huc110300KS_ws$p_Q10)) +
+  scale_fill_manual(values = sapply(ws_110300KS$tau_Q10, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_110300KS$tau_Q10, ws_110300KS$p_Q10)) +
   xlim(-103, -96.5) + ylim(36, 39.5) +
   ggtitle("M-K Test on Annual Q10 for Middle Arkansas Watershed 1902 - 2021") +
   theme(legend.position="none")
@@ -369,12 +383,12 @@ CA_mk_Q10_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
-  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q10, fill = tau_Q10, alpha = p_Q10), size = 3) +
-  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc180102CA_ws$tau_Q10, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q10, fill = tau_Q10, alpha = p_Q10), size = 3) +
+  geom_text_repel(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_180102CA$tau_Q10, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc180102CA_ws$tau_Q10, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc180102CA_ws$tau_Q10, huc180102CA_ws$p_Q10)) +
+  scale_fill_manual(values = sapply(ws_180102CA$tau_Q10, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_180102CA$tau_Q10, ws_180102CA$p_Q10)) +
   # + xlim(-103, -96.5) + ylim(36, 39.5)
   ggtitle("M-K Test on Annual Q10 for Klamath Watershed 1904 - 2021") +
   theme(legend.position="none")
@@ -386,12 +400,12 @@ MI_mk_Q50_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
-  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q50, fill = tau_Q50, alpha = p_Q50), size = 3) +
-  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc040500MI_ws$tau_Q50, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_040500MI,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q50, fill = tau_Q50, alpha = p_Q50), size = 3) +
+  geom_text_repel(data = ws_040500MI, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_040500MI$tau_Q50, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc040500MI_ws$tau_Q50, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc040500MI_ws$tau_Q50, huc040500MI_ws$p_Q50)) +
+  scale_fill_manual(values = sapply(ws_040500MI$tau_Q50, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_040500MI$tau_Q50, ws_040500MI$p_Q50)) +
   # + xlim(-87, -83.75) + ylim(41.25, 43.5)
   ggtitle("M-K Test on Annual Q50 for SE Lake Michigan Watershed 1901 - 2021") + 
   theme(legend.position="none")
@@ -401,12 +415,12 @@ KS_mk_Q50_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q50, fill = tau_Q50, alpha = p_Q50), size = 3) +
-  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc110300KS_ws$tau_Q50, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q50, fill = tau_Q50, alpha = p_Q50), size = 3) +
+  geom_text_repel(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_110300KS$tau_Q50, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc110300KS_ws$tau_Q50, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc110300KS_ws$tau_Q50, huc110300KS_ws$p_Q50)) +
+  scale_fill_manual(values = sapply(ws_110300KS$tau_Q50, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_110300KS$tau_Q50, ws_110300KS$p_Q50)) +
   xlim(-103, -96.5) + ylim(36, 39.5) +
   ggtitle("M-K Test on Annual Q50 for Middle Arkansas Watershed 1902 - 2021") +
   theme(legend.position="none")
@@ -416,12 +430,12 @@ CA_mk_Q50_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
-  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q50, fill = tau_Q50, alpha = p_Q50), size = 3) +
-  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc180102CA_ws$tau_Q50, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q50, fill = tau_Q50, alpha = p_Q50), size = 3) +
+  geom_text_repel(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_180102CA$tau_Q50, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc180102CA_ws$tau_Q50, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc180102CA_ws$tau_Q50, huc180102CA_ws$p_Q50)) +
+  scale_fill_manual(values = sapply(ws_180102CA$tau_Q50, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_180102CA$tau_Q50, ws_180102CA$p_Q50)) +
   # + xlim(-103, -96.5) + ylim(36, 39.5)
   ggtitle("M-K Test on Annual Q50 for Klamath Watershed 1904 - 2021") +
   theme(legend.position="none")
@@ -433,12 +447,12 @@ MI_mk_Q90_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
-  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q90, fill = tau_Q90, alpha = p_Q90), size = 3) +
-  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc040500MI_ws$tau_Q90, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_040500MI,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q90, fill = tau_Q90, alpha = p_Q90), size = 3) +
+  geom_text_repel(data = ws_040500MI, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_040500MI$tau_Q90, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc040500MI_ws$tau_Q90, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc040500MI_ws$tau_Q90, huc040500MI_ws$Q90)) +
+  scale_fill_manual(values = sapply(ws_040500MI$tau_Q90, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_040500MI$tau_Q90, ws_040500MI$Q90)) +
   # + xlim(-87, -83.75) + ylim(41.25, 43.5)
   ggtitle("M-K Test on Annual Q90 for SE Lake Michigan Watershed 1901 - 2021") + 
   theme(legend.position="none")
@@ -448,12 +462,12 @@ KS_mk_Q90_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q90, fill = tau_Q90, alpha = p_Q90), size = 3) +
-  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc110300KS_ws$tau_Q90, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q90, fill = tau_Q90, alpha = p_Q90), size = 3) +
+  geom_text_repel(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_110300KS$tau_Q90, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc110300KS_ws$tau_Q90, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc110300KS_ws$tau_Q90, huc110300KS_ws$p_Q90)) +
+  scale_fill_manual(values = sapply(ws_110300KS$tau_Q90, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_110300KS$tau_Q90, ws_110300KS$p_Q90)) +
   xlim(-103, -96.5) + ylim(36, 39.5) +
   ggtitle("M-K Test on Annual Q90 for Middle Arkansas Watershed 1902 - 2021") +
   theme(legend.position="none")
@@ -463,12 +477,12 @@ CA_mk_Q90_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
-  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q90, fill = tau_Q90, alpha = p_Q90), size = 3) +
-  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
-  scale_shape_manual(values = sapply(huc180102CA_ws$tau_Q90, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q90, fill = tau_Q90, alpha = p_Q90), size = 3) +
+  geom_text_repel(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 3) +
+  scale_shape_manual(values = sapply(ws_180102CA$tau_Q90, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc180102CA_ws$tau_Q90, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc180102CA_ws$tau_Q90, huc180102CA_ws$p_Q90)) +
+  scale_fill_manual(values = sapply(ws_180102CA$tau_Q90, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_180102CA$tau_Q90, ws_180102CA$p_Q90)) +
   # + xlim(-103, -96.5) + ylim(36, 39.5)
   ggtitle("M-K Test on Annual Q90 for Klamath Watershed 1904 - 2021") +
   theme(legend.position="none")
@@ -480,12 +494,12 @@ MI_mk_Q95_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = SELakeMI_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "springgreen2", alpha = 0.5) +
-  geom_point(data = huc040500MI_ws,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q95, fill = tau_Q95, alpha = p_Q95), size = 3) +
-  geom_text_repel(data = huc040500MI_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size =4) +
-  scale_shape_manual(values = sapply(huc040500MI_ws$tau_Q95, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_040500MI,aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q95, fill = tau_Q95, alpha = p_Q95), size = 3) +
+  geom_text_repel(data = ws_040500MI, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size =4) +
+  scale_shape_manual(values = sapply(ws_040500MI$tau_Q95, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc040500MI_ws$tau_Q95, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc040500MI_ws$tau_Q95, huc040500MI_ws$p_Q95)) +
+  scale_fill_manual(values = sapply(ws_040500MI$tau_Q95, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_040500MI$tau_Q95, ws_040500MI$p_Q95)) +
   # + xlim(-87, -83.75) + ylim(41.25, 43.5)
   ggtitle("M-K Test on Annual Q95 for SE Lake Michigan Watershed 1901 - 2021") + 
   theme(legend.position="none")
@@ -495,12 +509,12 @@ KS_mk_Q95_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # geom_path(data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = MidArkRiver_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "tan2", alpha = 0.5) +
-  geom_point(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q95, fill = tau_Q95, alpha = p_Q95), size = 3) +
-  geom_text_repel(data = huc110300KS_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
-  scale_shape_manual(values = sapply(huc110300KS_ws$tau_Q95, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q95, fill = tau_Q95, alpha = p_Q95), size = 3) +
+  geom_text_repel(data = ws_110300KS, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = sapply(ws_110300KS$tau_Q95, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc110300KS_ws$tau_Q95, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc110300KS_ws$tau_Q95, huc110300KS_ws$p_Q95)) +
+  scale_fill_manual(values = sapply(ws_110300KS$tau_Q95, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_110300KS$tau_Q95, ws_110300KS$p_Q95)) +
   xlim(-103, -96.5) + ylim(36, 39.5) +
   ggtitle("M-K Test on Annual Q95 for Middle Arkansas Watershed 1902 - 2021") +
   theme(legend.position="none")
@@ -510,12 +524,12 @@ CA_mk_Q95_map <- ggplot() +
   # geom_path(data = us_rivers_df, aes(x = long, y = lat, group = group), color = "royalblue2") +
   # (data = us_states_df, aes(x = long, y = lat, group = group)) + 
   geom_polygon(data = Klamath_WS_boundary_df, aes(x = long, y = lat, group = group), fill = "plum2", alpha = 0.5) +
-  geom_point(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q95, fill = tau_Q95, alpha = p_Q95), size = 3) +
-  geom_text_repel(data = huc180102CA_ws, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
-  scale_shape_manual(values = sapply(huc180102CA_ws$tau_Q95, shape.picker), na.translate = TRUE, na.value = 1) +
+  geom_point(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, shape = tau_Q95, fill = tau_Q95, alpha = p_Q95), size = 3) +
+  geom_text_repel(data = ws_180102CA, aes(x = dec_long_va, y = dec_lat_va, label = station_nm), size = 4) +
+  scale_shape_manual(values = sapply(ws_180102CA$tau_Q95, shape.picker), na.translate = TRUE, na.value = 1) +
   scale_alpha_binned(breaks = 0.05, range = c(1, 0.1)) +
-  scale_fill_manual(values = sapply(huc180102CA_ws$tau_Q95, color.picker)) +
-  # scale_fill_manual(values = mapply(FUN = color.picker2, huc180102CA_ws$tau_Q95, huc180102CA_ws$p_Q95)) +
+  scale_fill_manual(values = sapply(ws_180102CA$tau_Q95, color.picker)) +
+  # scale_fill_manual(values = mapply(FUN = color.picker2, ws_180102CA$tau_Q95, ws_180102CA$p_Q95)) +
   # + xlim(-103, -96.5) + ylim(36, 39.5)
   ggtitle("M-K Test on Annual Q95 for Klamath Watershed 1904 - 2021") +
   theme(legend.position="none")
