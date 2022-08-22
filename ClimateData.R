@@ -58,13 +58,13 @@ cl_180102CA_P_PET_long <- cl_180102CA_P_PET[ , c("X18010201", "X18010202", "X180
 cl_040500MI_SPEI1 <- SPEI::spei(cl_040500MI_P_PET[2:8], 1)
 
 cl_040500MI_SPEI12_long <- SPEI::spei(cl_040500MI_P_PET_long, 12)
-  plot(cl_040500MI_long)
+  plot(cl_040500MI_SPEI12_long)
 
 cl_110300KS_SPEI12_long <- SPEI::spei(cl_110300KS_P_PET_long, 12)
-  plot(huc110300KS_cl_SPEI12_long)
+  plot(cl_110300KS_SPEI12_long)
 
 cl_180102CA_cl_SPEI12_long <- SPEI::spei(cl_180102CA_P_PET_long, 12)
-  plot(huc180102CA_cl_SPEI12_long)
+  plot(cl_180102CA_SPEI12_long)
 
 ## COMBINE date column with SPEI results, RENAME columns, REFORMAT date column 
 cl_040500MI_SPEI12 <- data.frame(cl_040500MI_P_PET$DATE, cl_040500MI_SPEI12[["fitted"]])

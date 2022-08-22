@@ -50,10 +50,10 @@ i = 1
 
 # for (i in 1:nrow(ws_040500MI)) {
 #         site_number <- ws_040500MI$site_no[i]
-# for (i in 1:nrow(ws_110300KS)) {
-#       site_number <- ws_110300KS$site_no[i]
-for (i in 1:nrow(ws_180102CA)) {
-  site_number <- ws_180102CA$site_no[i]
+for (i in 1:nrow(ws_110300KS)) {
+      site_number <- ws_110300KS$site_no[i]
+# for (i in 1:nrow(ws_180102CA)) {
+#   site_number <- ws_180102CA$site_no[i]
   
   ## RETRIEVE site info and streamflow data for gage station
   site_info <- dataRetrieval::readNWISsite(site_number)
@@ -75,11 +75,12 @@ for (i in 1:nrow(ws_180102CA)) {
   ## JOIN hydrologic year to sf_select to calculate sf metrics on water years instead of calendar years
   sf_select <- left_join(sf_select, sf[ ,c(3,5)], by = "year")
   
-  ## CALCULATE Q90 - 90th percentile of flow 
-  Q10 <- sf_select %>% 
-    summarize(Q10 = quantile(Discharge, probs = 0.9, na.rm = TRUE)) %>% 
-    #https://www.tutorialspoint.com/how-to-extract-initial-last-or-middle-characters-from-a-string-in-r
-    as.numeric(str_sub(Q10,-4,-2))
+  ## CALCULATE Q90 - 90th percentile of flow that is exceeded 10% of the time
+  # Q10 <- sf_select %>% 
+  #   summarize(Q10 = quantile(Discharge, probs = 0.9, na.rm = TRUE)) %>% 
+  #   #https://www.tutorialspoint.com/how-to-extract-initial-last-or-middle-characters-from-a-string-in-r
+  #   as.numeric(str_sub(Q10,-4,-2))
+  Q10 <- lfstat::Qxx(sf, Qxx = 10, yearly = FALSE) 
     
   ## CALCULATE annual mean discharge
   meanQ <- sf_select %>%
@@ -87,21 +88,17 @@ for (i in 1:nrow(ws_180102CA)) {
     summarize(meanQ = mean(Discharge)) %>% 
     as.numeric(str_sub(meanQ,5,-1))
   
-  ## CALCULATE Q50 - 50th percentile of flow
-  Q50 <- sf_select %>% 
-    summarize(Q50 = quantile(Discharge, probs = 0.5, na.rm = TRUE)) %>% 
-    as.numeric(str_sub(Q50,-4,-2))
+  ## CALCULATE Q50 - 50th percentile of flow that is exceeded 50% of the time
+  # Q50 <- sf_select %>% 
+  #   summarize(Q50 = quantile(Discharge, probs = 0.5, na.rm = TRUE)) %>% 
+  #   as.numeric(str_sub(Q50,-4,-2))
+  Q50 <- lfstat::Qxx(sf, Qxx = 50, yearly = FALSE) 
   
   ## CALCULATE Annual Mean Baseflow - Average baseflow for each year
   baseflow <- sf %>%
     na.omit(sf) %>%  
     summarise(MeanBaseflow = mean(baseflow)) %>% 
     as.numeric(str_sub(meanQ,8,-1))
-  
-  ## CALCULATE Q10 - 10th percentile of flow
-  Q90 <- sf_select %>% 
-    summarize(Q90 = quantile(Discharge, probs = 0.1, na.rm = TRUE)) %>% 
-    as.numeric(str_sub(Q90,-4,-1))
   
   ## CALCULATE MAM7 - Mean Annual Minimum over 7-day period -> 7-day low flow
   MAM7 <- lfstat::MAM(sf, n=7, yearly = TRUE)
@@ -110,10 +107,17 @@ for (i in 1:nrow(ws_180102CA)) {
     summarise(MAM7 = mean(MAM7)) %>% 
     as.numeric(str_sub(Q95,4,-2))
   
-  ## CALCULATE Q90 - 90th percentile of flow 
-  Q95 <- sf_select %>% 
-    summarize(Q95= quantile(Discharge, probs = 0.05, na.rm = TRUE)) %>% 
-    as.numeric(str_sub(Q95,-4,-2))
+  ## CALCULATE Q90 - 10th percentile of flow that is exceeded 90% of the time
+  # Q90 <- sf_select %>% 
+  #   summarize(Q90 = quantile(Discharge, probs = 0.1, na.rm = TRUE)) %>% 
+  #   as.numeric(str_sub(Q90,-4,-1))
+  Q90 <- lfstat::Qxx(sf, Qxx = 90, yearly = FALSE) 
+  
+  ## CALCULATE Q90 - 90th percentile of flow that is exceeded 95% of the time
+  # Q95 <- sf_select %>% 
+  #   summarize(Q95= quantile(Discharge, probs = 0.05, na.rm = TRUE)) %>% 
+  #   as.numeric(str_sub(Q95,-4,-2))
+  Q95 <- lfstat::Qxx(sf, Qxx = 95, yearly = FALSE) 
   
   ## CALCULATE BFI - Baseflow Index for each year
   # BFI <- lfstat::BFI(sf, year = "any", breakdays = NULL, yearly = TRUE)
@@ -127,25 +131,25 @@ for (i in 1:nrow(ws_180102CA)) {
   # ws_040500MI$MeanQ[i] <- as.numeric(meanQ)
   # ws_040500MI$Q50[i] <- as.numeric(Q50)
   # ws_040500MI$Baseflow[i] <- as.numeric(baseflow)
-  # ws_040500MI$Q90[i] <- as.numeric(Q90)
   # ws_040500MI$MAM7[i] <- as.numeric(MAM7)
+  # ws_040500MI$Q90[i] <- as.numeric(Q90)
   # ws_040500MI$Q95[i] <- as.numeric(Q95)
   
-  # ws_110300KS$Q10[i] <- as.numeric(Q10)
-  # ws_110300KS$MeanQ[i] <- as.numeric(meanQ)
-  # ws_110300KS$Q50[i] <- as.numeric(Q50)
-  # ws_110300KS$Baseflow[i] <- as.numeric(baseflow)
-  # ws_110300KS$Q90[i] <- as.numeric(Q90)
-  # ws_110300KS$MAM7[i] <- as.numeric(MAM7)
-  # ws_110300KS$Q95[i] <- as.numeric(Q95)
+  ws_110300KS$Q10[i] <- as.numeric(Q10)
+  ws_110300KS$MeanQ[i] <- as.numeric(meanQ)
+  ws_110300KS$Q50[i] <- as.numeric(Q50)
+  ws_110300KS$Baseflow[i] <- as.numeric(baseflow)
+  ws_110300KS$MAM7[i] <- as.numeric(MAM7)
+  ws_110300KS$Q90[i] <- as.numeric(Q90)
+  ws_110300KS$Q95[i] <- as.numeric(Q95)
  
-  ws_180102CA$Q10[i] <- as.numeric(Q10)
-  ws_180102CA$MeanQ[i] <- as.numeric(meanQ)
-  ws_180102CA$Q50[i] <- as.numeric(Q50)
-  ws_180102CA$Baseflow[i] <- as.numeric(baseflow)
-  ws_180102CA$Q90[i] <- as.numeric(Q90)
-  ws_180102CA$MAM7[i] <- as.numeric(MAM7)
-  ws_180102CA$Q95[i] <- as.numeric(Q95)
+  # ws_180102CA$Q10[i] <- as.numeric(Q10)
+  # ws_180102CA$MeanQ[i] <- as.numeric(meanQ)
+  # ws_180102CA$Q50[i] <- as.numeric(Q50)
+  # ws_180102CA$Baseflow[i] <- as.numeric(baseflow)
+  # ws_180102CA$MAM7[i] <- as.numeric(MAM7)
+  # ws_180102CA$Q90[i] <- as.numeric(Q90)
+  # ws_180102CA$Q95[i] <- as.numeric(Q95)
   
   
   
@@ -161,20 +165,6 @@ for (i in 1:nrow(ws_180102CA)) {
   # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_MI_ep/MI_", i, "_metrics_ep.csv"))
   # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_KS_ep/KS_", i, "_metrics_ep.csv"))
   # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_CA_ep/CA_", i, "_metrics_ep.csv"))
-  
-  
- ## ALIGN "Year" column so that NA years are preserved for plotting, CHOOSE watershed & time frame before running for loop
-  # sf_metrics <- left_join(sf_metrics_year_MI_hd, sf_metrics, by = "Year")
-  # sf_metrics <- left_join(sf_metrics_year_KS_hd, sf_metrics, by = "Year")
-  # sf_metrics <- left_join(sf_metrics_year_CA_hd, sf_metrics, by = "Year")
-  
-  # sf_metrics <- left_join(sf_metrics_year_MI_long, sf_metrics, by = "Year")
-  # sf_metrics <- left_join(sf_metrics_year_KS_long, sf_metrics, by = "Year")
-  # sf_metrics <- left_join(sf_metrics_year_CA_long, sf_metrics, by = "Year")
-  
-  # sf_metrics <- left_join(sf_metrics_year_MI_ep, sf_metrics, by = "Year")
-  # sf_metrics <- left_join(sf_metrics_year_KS_ep, sf_metrics, by = "Year")
-  # sf_metrics <- left_join(sf_metrics_year_CA_ep, sf_metrics, by = "Year")
 
   
 }
@@ -228,20 +218,20 @@ ws_180102CA <- ws_180102CA_ep
 pca_stations <- ws_040500MI$station_nm
 pca_metrics <- colnames(ws_040500MI[ , 24:29])
 pca_ids <- ws_040500MI$id
-pca_select <- ws_040500MI[ , c("Q10", "MeanQ", "Q50", "Baseflow", "Q90", "MAM7", "Q95")]
+pca_select <- ws_040500MI[ , c("Q10", "MeanQ", "Q50", "Baseflow", "MAM7", "Q90", "Q95")]
 
 pca_stations <- ws_110300KS$station_nm
-pca_metrics <- colnames(ws_110300KS[ , c("Q10", "MeanQ", "Q50", "Baseflow", "Q90", "MAM7", "Q95")])
+pca_metrics <- colnames(ws_110300KS[ , c("Q10", "MeanQ", "Q50", "Baseflow", "MAM7", "Q90", "Q95")])
 pca_ids <- ws_110300KS$id
-pca_select <- ws_110300KS[ , c("Q10", "MeanQ", "Q50", "Baseflow", "Q90", "MAM7", "Q95")]
+pca_select <- ws_110300KS[ , c("Q10", "MeanQ", "Q50", "Baseflow", "MAM7", "Q90", "Q95")]
 
 pca_stations <- ws_180102CA$station_nm
 pca_metrics <- colnames(ws_180102CA[ , 24:29])
 pca_ids <- ws_180102CA$id
-pca_select <- ws_180102CAS[ , c("Q10", "MeanQ", "Q50", "Baseflow", "Q90", "MAM7", "Q95")]
+pca_select <- ws_180102CAS[ , c("Q10", "MeanQ", "Q50", "Baseflow", "MAM7", "Q90", "Q95")]
 
 
-## REFORMAT columns from lists to numeric for compatibility with princomp function
+## REFORMAT columns from lists to numerics for compatibility with princomp function
 pca_select$Q90 <- as.numeric(pca_select$Q90)
 pca_select$MeanQ <- as.numeric(pca_select$MeanQ)
 pca_select$Baseflow <- as.numeric(pca_select$Baseflow)
@@ -328,13 +318,16 @@ qplot(x = c(1:7), pca_var_explained) +
 ## PLOT PCA scores
 autoplot(pca_results, data = pca_select, colour = as.factors(pca_stations))
 
+## MULTIPLY by -1 to adjust for R package calculations
+pca_results$loadings <- pca_results$loadings
 ## PLOT PCA loadings
-plot(pca_results$loadings, pch = 16, col = as.factor(pca_metrics), main = "PCA  Loadings for Streamflow Metrics in Middle Arkansas River Watershed", xlim = c(-1, 1), ylim = c(-1, 1))
+plot(pca_results$loadings, pch = 16, col = c("#9451cc", "#06ccd6", "#d19d43", "#0939a5", "#259f3d", "#a11437", "#12173e"), main = "PCA  Loadings for Streamflow Metrics in Middle Arkansas River Watershed", xlim = c(-1, 1), ylim = c(-1, 1))
+segments(c(-1, 0), c(0, -1), c(1, 0), c(0, 1))
 text(pca_results$loadings,
      labels = pca_metrics,
-     cex = 0.6, pos = 3, size = 32)
-legend("topright", legend = pca_metrics, col = as.factor(pca_metrics))
-segments(c(-1, 0), c(0, -1), c(1, 0), c(0, 1))
+     cex = 1, pos = 3)
+legend("topright", legend = pca_metrics, pch = 16, col = c("#9451cc", "#06ccd6", "#d19d43", "#0939a5", "#259f3d", "#a11437", "#12173e"))
+
 
 ## PLOT PCA biplot of scores and loadings
 biplot(pca_results, xlabs = pca_ids)
