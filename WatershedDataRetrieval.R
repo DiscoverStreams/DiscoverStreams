@@ -31,7 +31,7 @@ end_date <- ""  # Long data
 end_date <- "2021-09-30" # HD and 1951 data
 end_date <- "1940-09-30" # EP data
 
-## RUN corresponding huc dataframe for each HUC06, also set HUC06 in for loop
+## RUN corresponding huc dataframe for each HUC06 before running for loop, also set HUC06 in for loop
 huc040500MI <- data.frame()
 huc110300KS <- data.frame()
 huc180102CA <- data.frame()
@@ -39,7 +39,7 @@ huc180102CA <- data.frame()
 ## CLEAR site select data frame before running for loop for each HUC06 
 site_select <- data.frame()
 
-## CHANGE HUC08 name then RUN for loop-- SET start date and end date before running for loop
+## CHANGE HUC06 name for for loop, years available parameter, and HUC06 dataframe to bind at end, then RUN for loop-- SET start date and end date before running for loop & CLEAR site_select and huc data frames
 # for (i in seq_along(NWISsites_040500MI)) {
 #   site_number <- NWISsites_040500MI[i]
 # for (i in seq_along(NWISsites_110300KS)) {
@@ -70,8 +70,8 @@ for (i in seq_along(NWISsites_180102CA)) {
   site_select <- site_select[!duplicated(site_select), ]
   
   ## SELECT sites with more than 15 years (for EP data), more than 30 years data (for all records and HD data), or more than 100 years data (for long data)
-  # site_select <- subset(site_select, yearsAvail >= 15, select = c(1:8))
-  site_select <- subset(site_select, yearsAvail >= 30, select = c(1:8))
+  site_select <- subset(site_select, yearsAvail >= 15, select = c(1:8))
+  # site_select <- subset(site_select, yearsAvail >= 30, select = c(1:8))
   # site_select <- subset(site_select, yearsAvail >= 100, select = c(1:8))
   
   ## APPEND HUC06 site selected to corresponding HUC06 data frame, CHOOSE HUC06 by commenting out other HUC06 watersheds
@@ -85,6 +85,7 @@ for (i in seq_along(NWISsites_180102CA)) {
 }
 
 
+### SAVE data retrieval results by watershed and time period ###
 ## SUBSET entire record, by specific start and end dates, OR trim data using start date and end date from for loop
 huc040500MI_1951sel <- huc040500MI
 huc040500MI_1960sel <- subset(huc040500MI, startDate == "1959-10-01", select = c(1:8))
@@ -109,7 +110,7 @@ huc180102CA_hd <- subset(huc180102CA, startDate == "1961-10-01", select = c(1:8)
 huc180102CA_hd <- subset(huc180102CA_hd, endDate == "2021-09-30", select = c(1:8))
 ws_180102CA_hd <- huc180102CA_hd
 
-## SUBSET by long-period data and SAVE to watershed object to build on while preserving original selected data
+## SAVE all records from all stations with more than 30 years data and SAVE to watershed object to build on while preserving original selected data
 huc040500MI_all <- huc040500MI
 ws_040500MI_all <- huc040500MI_all
 
