@@ -13,7 +13,7 @@ library(trend)
 
 
 
-## SET watershed object to work with based on time period
+## SET watershed dataframe to work with based on time period
 ws_040500MI <- ws_040500MI_hd
 ws_110300KS <- ws_110300KS_hd
 ws_180102CA <- ws_180102CA_hd
@@ -62,16 +62,128 @@ end_date <- ""  # Long data
 end_date <- "2021-09-30" # HD and 1951 data
 end_date <- "1940-09-30" # EP data
 
-## RETRIEVE streamflow data to get dataframe without NAs -- NA's end up being coerced by createlfobject -- SET start date and end date before running for loop
+## LOOP 1 - metrics calculated over entire time period -> RETRIEVE streamflow data to get dataframe without NAs -- NA's end up being coerced by createlfdataframe -- SET start date and end date before running for loop
+i = 1
+
+# for (i in 1:nrow(ws_040500MI)) {
+#         site_number <- ws_040500MI$site_no[i]
+# for (i in 1:nrow(ws_110300KS)) {
+#       site_number <- ws_110300KS$site_no[i]
+for (i in 1:nrow(ws_180102CA)) {
+  site_number <- ws_180102CA$site_no[i]
+  
+  ## RETRIEVE site info and streamflow data for gage station
+  site_info <- dataRetrieval::readNWISsite(site_number)
+  site_name <- site_info$station_nm
+  raw_daily <- dataRetrieval::readNWISdv(site_number, parameter_code, start_date, end_date)
+  
+  ## PREPARE dataframe for calculations 
+  sf_select <- subset(raw_daily, select = c(3,4))
+  colnames(sf_select) <- c("Date", "Discharge")
+  sf_select$year <- as.numeric(format(sf_select[[1]], "%Y"))
+  
+  ## PREPARE data for use with lfstat - needs timestamp broken into columns for day, month, year, flow
+  sf <- separate(sf_select, "Date", c("year", "month", "day"), "-")
+  colnames(sf) <- c("year","month", "day", "flow")
+  sf <- lfstat::createlfobj(sf, hyearstart = 10)
+  sf$hyear <- as.numeric(sf$hyear)
+  sf$year <- as.numeric(sf$year)
+  
+  ## JOIN hydrologic year to sf_select to calculate sf metrics on water years instead of calendar years
+  sf_select <- left_join(sf_select, sf[ ,c(3,5)], by = "year")
+  
+  ## CALCULATE Q90 - 90th percentile of flow that is exceeded 10% of the time
+  # Q10 <- sf_select %>% 
+  #   summarize(Q10 = quantile(Discharge, probs = 0.9, na.rm = TRUE)) %>% 
+  #   #https://www.tutorialspoint.com/how-to-extract-initial-last-or-middle-characters-from-a-string-in-r
+  #   as.numeric(str_sub(Q10,-4,-2))
+  Q10 <- lfstat::Qxx(sf, Qxx = 10, yearly = FALSE) 
+  
+  ## CALCULATE annual mean discharge
+  # meanQ <- sf_select %>%
+  #   na.omit(sf_select) %>%
+  #   summarize(meanQ = mean(Discharge))
+  # meanQ <- str_sub(meanQ,1,-1) %>%
+  #   as.numeric(meanQ)
+  meanQ <- lfstat::meanflow(sf, yearly = FALSE)
+  
+  ## CALCULATE Q50 - 50th percentile of flow that is exceeded 50% of the time
+  # Q50 <- sf_select %>% 
+  #   summarize(Q50 = quantile(Discharge, probs = 0.5, na.rm = TRUE)) %>% 
+  #   as.numeric(str_sub(Q50,-4,-2))
+  Q50 <- lfstat::Qxx(sf, Qxx = 50, yearly = FALSE) 
+  
+  ## CALCULATE Annual Mean Baseflow - Average baseflow for each year
+  baseflow <- sf %>%
+    na.omit(sf) %>%  
+    summarise(baseflow = mean(baseflow)) 
+  baseflow <- str_sub(baseflow,1,-1) %>% 
+    as.numeric(baseflow)
+  
+  ## CALCULATE MAM7 - Mean Annual Minimum over 7-day period -> 7-day low flow
+  MAM7 <- lfstat::MAM(sf, n=7, yearly = TRUE)
+  colnames(MAM7) <- c("hyear","MAM7")
+  MAM7 <- MAM7 %>% 
+    summarise(MAM7 = mean(MAM7))
+  MAM7 <- str_sub(MAM7,1,-1) %>% 
+    as.numeric(MAM7)
+  
+  ## CALCULATE Q90 - 10th percentile of flow that is exceeded 90% of the time
+  # Q90 <- sf_select %>% 
+  #   summarize(Q90 = quantile(Discharge, probs = 0.1, na.rm = TRUE)) %>% 
+  #   as.numeric(str_sub(Q90,-4,-1))
+  Q90 <- lfstat::Qxx(sf, Qxx = 90, yearly = FALSE) 
+  
+  ## CALCULATE Q90 - 90th percentile of flow that is exceeded 95% of the time
+  # Q95 <- sf_select %>% 
+  #   summarize(Q95= quantile(Discharge, probs = 0.05, na.rm = TRUE)) %>% 
+  #   as.numeric(str_sub(Q95,-4,-2))
+  Q95 <- lfstat::Qxx(sf, Qxx = 95, yearly = FALSE) 
+  
+  ## CALCULATE BFI - Baseflow Index for each year
+  # BFI <- lfstat::BFI(sf, year = "any", breakdays = NULL, yearly = TRUE)
+  # BFI <- data.frame(sf_metrics$Year, BFI)
+  # colnames(BFI) <- c("Year", "BFI") 
+  # sf_metrics <- left_join(sf_metrics, BFI, by = "Year")
+  
+  
+  ## APPEND metric results to WS dataframe, CHOOSE corresponding watershed before running for loop
+  # ws_040500MI$Q10[i] <- as.numeric(Q10)
+  # ws_040500MI$MeanQ[i] <- as.numeric(meanQ)
+  # ws_040500MI$Q50[i] <- as.numeric(Q50)
+  # ws_040500MI$Baseflow[i] <- as.numeric(baseflow)
+  # ws_040500MI$MAM7[i] <- as.numeric(MAM7)
+  # ws_040500MI$Q90[i] <- as.numeric(Q90)
+  # ws_040500MI$Q95[i] <- as.numeric(Q95)
+  
+  # ws_110300KS$Q10[i] <- as.numeric(Q10)
+  # ws_110300KS$MeanQ[i] <- as.numeric(meanQ)
+  # ws_110300KS$Q50[i] <- as.numeric(Q50)
+  # ws_110300KS$Baseflow[i] <- as.numeric(baseflow)
+  # ws_110300KS$MAM7[i] <- as.numeric(MAM7)
+  # ws_110300KS$Q90[i] <- as.numeric(Q90)
+  # ws_110300KS$Q95[i] <- as.numeric(Q95)
+  
+  ws_180102CA$Q10[i] <- as.numeric(Q10)
+  ws_180102CA$MeanQ[i] <- as.numeric(meanQ)
+  ws_180102CA$Q50[i] <- as.numeric(Q50)
+  ws_180102CA$Baseflow[i] <- as.numeric(baseflow)
+  ws_180102CA$MAM7[i] <- as.numeric(MAM7)
+  ws_180102CA$Q90[i] <- as.numeric(Q90)
+  ws_180102CA$Q95[i] <- as.numeric(Q95)
+  
+}
+
+## LOOP 2 - yearly metrics -> RETRIEVE streamflow data to get dataframe without NAs -- NA's end up being coerced by create lf object -- SET start date and end date before running for loop
 
 i = 1
 
 # for (i in 1:nrow(ws_040500MI)) {
 #         site_number <- ws_040500MI$site_no[i]
-for (i in 1:nrow(ws_110300KS)) {
-      site_number <- ws_110300KS$site_no[i]
-# for (i in 1:nrow(ws_180102CA)) {
-#   site_number <- ws_180102CA$site_no[i]
+# for (i in 1:nrow(ws_110300KS)) {
+#       site_number <- ws_110300KS$site_no[i]
+for (i in 1:nrow(ws_180102CA)) {
+  site_number <- ws_180102CA$site_no[i]
   
   ## RETRIEVE site info and streamflow data for gage station
   site_info <- dataRetrieval::readNWISsite(site_number)
@@ -105,9 +217,11 @@ for (i in 1:nrow(ws_110300KS)) {
  
   
   ## CALCULATE annual mean discharge
-  meanQ <- sf_select %>% 
-    group_by(hyear) %>% 
-    summarize(MeanQ = mean(Discharge))
+  # meanQ <- sf_select %>% 
+  #   group_by(hyear) %>% 
+  #   summarize(MeanQ = mean(Discharge))
+  meanQ <- lfstat::meanflow(sf, yearly = TRUE)
+  colnames(meanQ) <- c("hyear", "MeanQ")
   
   sf_metrics <- left_join(sf_metrics, meanQ, by = "hyear")
   
@@ -208,82 +322,82 @@ for (i in 1:nrow(ws_110300KS)) {
   # if(mk_test_Q95$estimates[3] > 0)
   #   ws_040500MI$tau_Q95[i] <- "+"
 
-  ws_110300KS$p_Q10[i] <- mk_test_Q10$p.value[1]
-  if(mk_test_Q10$estimates[3] < 0)
-    ws_110300KS$tau_Q10[i] <- "-"
-  if(mk_test_Q10$estimates[3] > 0)
-    ws_110300KS$tau_Q10[i] <- "+"
-  ws_110300KS$p_MeanQ[i] <- mk_test_MeanQ$p.value[1]
-  if(mk_test_MeanQ$estimates[3] < 0)
-    ws_110300KS$tau_MeanQ[i] <- "-"
-  if(mk_test_MeanQ$estimates[3] > 0)
-    ws_110300KS$tau_MeanQ[i] <- "+"
-  ws_110300KS$p_Q50[i] <- mk_test_Q50$p.value[1]
-  if(mk_test_Q50$estimates[3] < 0)
-    ws_110300KS$tau_Q50[i] <- "-"
-  if(mk_test_Q50$estimates[3] > 0)
-    ws_110300KS$tau_Q50[i] <- "+"
-  ws_110300KS$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
-  if(mk_test_Baseflow$estimates[3] < 0)
-    ws_110300KS$tau_Baseflow[i] <- "-"
-  if(mk_test_Baseflow$estimates[3] > 0)
-    ws_110300KS$tau_Baseflow[i] <- "+"
-  ws_110300KS$p_MAM7[i] <- mk_test_MAM7$p.value[1]
-  if(mk_test_MAM7$estimates[3] == "NaN")
-    ws_110300KS$tau_MAM7[i] <- "NA"
-  if(!is.na(mk_test_MAM7$estimates[3]) < 0)
-    ws_110300KS$tau_MAM7[i] <- "-"
-  if(!is.na(mk_test_MAM7$estimates[3]) > 0)
-    ws_110300KS$tau_MAM7[i] <- "+"
-  ws_110300KS$p_Q90[i] <- mk_test_Q90$p.value[1]
-  if(mk_test_Q90$estimates[3] < 0)
-    ws_110300KS$tau_Q90[i] <- "-"
-  if(mk_test_Q90$estimates[3] > 0)
-    ws_110300KS$tau_Q90[i] <- "+"
-  ws_110300KS$p_Q95[i] <- mk_test_Q95$p.value[1]
-  if(mk_test_MAM7$estimates[3] == "NaN")
-    ws_110300KS$tau_MAM7[i] <- "NA"
-  if(!is.na(mk_test_Q95$estimates[3]) < 0)
-    ws_110300KS$tau_Q95[i] <- "-"
-  if(!is.na(mk_test_Q95$estimates[3]) > 0)
-    ws_110300KS$tau_Q95[i] <- "+"
+  # ws_110300KS$p_Q10[i] <- mk_test_Q10$p.value[1]
+  # if(mk_test_Q10$estimates[3] < 0)
+  #   ws_110300KS$tau_Q10[i] <- "-"
+  # if(mk_test_Q10$estimates[3] > 0)
+  #   ws_110300KS$tau_Q10[i] <- "+"
+  # ws_110300KS$p_MeanQ[i] <- mk_test_MeanQ$p.value[1]
+  # if(mk_test_MeanQ$estimates[3] < 0)
+  #   ws_110300KS$tau_MeanQ[i] <- "-"
+  # if(mk_test_MeanQ$estimates[3] > 0)
+  #   ws_110300KS$tau_MeanQ[i] <- "+"
+  # ws_110300KS$p_Q50[i] <- mk_test_Q50$p.value[1]
+  # if(mk_test_Q50$estimates[3] < 0)
+  #   ws_110300KS$tau_Q50[i] <- "-"
+  # if(mk_test_Q50$estimates[3] > 0)
+  #   ws_110300KS$tau_Q50[i] <- "+"
+  # ws_110300KS$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
+  # if(mk_test_Baseflow$estimates[3] < 0)
+  #   ws_110300KS$tau_Baseflow[i] <- "-"
+  # if(mk_test_Baseflow$estimates[3] > 0)
+  #   ws_110300KS$tau_Baseflow[i] <- "+"
+  # ws_110300KS$p_MAM7[i] <- mk_test_MAM7$p.value[1]
+  # if(mk_test_MAM7$estimates[3] == "NaN")
+  #   ws_110300KS$tau_MAM7[i] <- "NA"
+  # if(!is.na(mk_test_MAM7$estimates[3]) < 0)
+  #   ws_110300KS$tau_MAM7[i] <- "-"
+  # if(!is.na(mk_test_MAM7$estimates[3]) > 0)
+  #   ws_110300KS$tau_MAM7[i] <- "+"
+  # ws_110300KS$p_Q90[i] <- mk_test_Q90$p.value[1]
+  # if(mk_test_Q90$estimates[3] < 0)
+  #   ws_110300KS$tau_Q90[i] <- "-"
+  # if(mk_test_Q90$estimates[3] > 0)
+  #   ws_110300KS$tau_Q90[i] <- "+"
+  # ws_110300KS$p_Q95[i] <- mk_test_Q95$p.value[1]
+  # if(mk_test_MAM7$estimates[3] == "NaN")
+  #   ws_110300KS$tau_MAM7[i] <- "NA"
+  # if(!is.na(mk_test_Q95$estimates[3]) < 0)
+  #   ws_110300KS$tau_Q95[i] <- "-"
+  # if(!is.na(mk_test_Q95$estimates[3]) > 0)
+  #   ws_110300KS$tau_Q95[i] <- "+"
   
 
-  # ws_180102CA$p_Q10[i] <- mk_test_Q10$p.value[1]
-  # if(mk_test_Q10$estimates[3] < 0)
-  #   ws_180102CA$tau_Q10[i] <- "-"
-  # if(mk_test_Q10$estimates[3] > 0)
-  #   ws_180102CA$tau_Q10[i] <- "+"
-  # ws_180102CA$p_MeanQ[i] <- mk_test_MeanQ$p.value[1]
-  # if(mk_test_MeanQ$estimates[3] < 0)
-  #   ws_180102CA$tau_MeanQ[i] <- "-"
-  # if(mk_test_MeanQ$estimates[3] > 0)
-  #   ws_180102CA$tau_MeanQ[i] <- "+"
-  # ws_180102CA$p_Q50[i] <- mk_test_Q50$p.value[1]
-  # if(mk_test_Q50$estimates[3] < 0)
-  #   ws_180102CA$tau_Q50[i] <- "-"
-  # if(mk_test_Q50$estimates[3] > 0)
-  #   ws_180102CA$tau_Q50[i] <- "+"
-  # ws_180102CA$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
-  # if(mk_test_Baseflow$estimates[3] < 0)
-  #   ws_180102CA$tau_Baseflow[i] <- "-"
-  # if(mk_test_Baseflow$estimates[3] > 0)
-  #   ws_180102CA$tau_Baseflow[i] <- "+"
-  # ws_180102CA$p_MAM7[i] <- mk_test_MAM7$p.value[1]
-  # if(mk_test_MAM7$estimates[3] < 0)
-  #   ws_180102CA$tau_MAM7[i] <- "-"
-  # if(mk_test_MAM7$estimates[3] > 0)
-  #   ws_180102CA$tau_MAM7[i] <- "+"
-  # ws_180102CA$p_Q90[i] <- mk_test_Q90$p.value[1]
-  # if(mk_test_Q90$estimates[3] < 0)
-  #   ws_180102CA$tau_Q90[i] <- "-"
-  # if(mk_test_Q90$estimates[3] > 0)
-  #   ws_180102CA$tau_Q90[i] <- "+"
-  # ws_180102CA$p_Q95[i] <- mk_test_Q95$p.value[1]
-  # if(mk_test_Q95$estimates[3] < 0)
-  #   ws_180102CA$tau_Q95[i] <- "-"
-  # if(mk_test_Q95$estimates[3] > 0)
-  #   ws_180102CA$tau_Q95[i] <- "+"
+  ws_180102CA$p_Q10[i] <- mk_test_Q10$p.value[1]
+  if(mk_test_Q10$estimates[3] < 0)
+    ws_180102CA$tau_Q10[i] <- "-"
+  if(mk_test_Q10$estimates[3] > 0)
+    ws_180102CA$tau_Q10[i] <- "+"
+  ws_180102CA$p_MeanQ[i] <- mk_test_MeanQ$p.value[1]
+  if(mk_test_MeanQ$estimates[3] < 0)
+    ws_180102CA$tau_MeanQ[i] <- "-"
+  if(mk_test_MeanQ$estimates[3] > 0)
+    ws_180102CA$tau_MeanQ[i] <- "+"
+  ws_180102CA$p_Q50[i] <- mk_test_Q50$p.value[1]
+  if(mk_test_Q50$estimates[3] < 0)
+    ws_180102CA$tau_Q50[i] <- "-"
+  if(mk_test_Q50$estimates[3] > 0)
+    ws_180102CA$tau_Q50[i] <- "+"
+  ws_180102CA$p_Baseflow[i] <- mk_test_Baseflow$p.value[1]
+  if(mk_test_Baseflow$estimates[3] < 0)
+    ws_180102CA$tau_Baseflow[i] <- "-"
+  if(mk_test_Baseflow$estimates[3] > 0)
+    ws_180102CA$tau_Baseflow[i] <- "+"
+  ws_180102CA$p_MAM7[i] <- mk_test_MAM7$p.value[1]
+  if(mk_test_MAM7$estimates[3] < 0)
+    ws_180102CA$tau_MAM7[i] <- "-"
+  if(mk_test_MAM7$estimates[3] > 0)
+    ws_180102CA$tau_MAM7[i] <- "+"
+  ws_180102CA$p_Q90[i] <- mk_test_Q90$p.value[1]
+  if(mk_test_Q90$estimates[3] < 0)
+    ws_180102CA$tau_Q90[i] <- "-"
+  if(mk_test_Q90$estimates[3] > 0)
+    ws_180102CA$tau_Q90[i] <- "+"
+  ws_180102CA$p_Q95[i] <- mk_test_Q95$p.value[1]
+  if(mk_test_Q95$estimates[3] < 0)
+    ws_180102CA$tau_Q95[i] <- "-"
+  if(mk_test_Q95$estimates[3] > 0)
+    ws_180102CA$tau_Q95[i] <- "+"
   
   
   
@@ -293,12 +407,12 @@ for (i in 1:nrow(ws_110300KS)) {
   # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_CA/CA_hd/CA_", i, "_metrics_hd.csv"))
   
   # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_MI/MI_long/MI_", i, "_metrics_long.csv"))
-  write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_KS/KS_long/KS_", i, "_metrics_long.csv"))
+  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_KS/KS_long/KS_", i, "_metrics_long.csv"))
   # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_CA/CA_long/CA_", i, "_metrics_long.csv"))
   
   # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_MI/MI_ep/MI_", i, "_metrics_ep.csv"))
   # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_KS/KS_ep/KS_", i, "_metrics_ep.csv"))
-  # write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_CA/CA_ep/CA_", i, "_metrics_ep.csv"))
+  write.csv(sf_metrics, paste("~/GradSchool/DiscoverStreams/outputs/sfmetrics_CA/CA_ep/CA_", i, "_metrics_ep.csv"))
   
   
  ## ALIGN "Year" column so that NA years are preserved for plotting, CHOOSE watershed & time frame before running for loop
@@ -307,17 +421,15 @@ for (i in 1:nrow(ws_110300KS)) {
   # sf_metrics <- left_join(sf_metrics_year_CA_hd, sf_metrics, by = "hyear")
   
   # sf_metrics <- left_join(sf_metrics_year_MI_long, sf_metrics, by = "hyear")
-  sf_metrics <- left_join(sf_metrics_year_KS_long, sf_metrics, by = "hyear")
+  # sf_metrics <- left_join(sf_metrics_year_KS_long, sf_metrics, by = "hyear")
   # sf_metrics <- left_join(sf_metrics_year_CA_long, sf_metrics, by = "hyear")
   
   # sf_metrics <- left_join(sf_metrics_year_MI_ep, sf_metrics, by = "hyear")
   # sf_metrics <- left_join(sf_metrics_year_KS_ep, sf_metrics, by = "hyear")
-  # sf_metrics <- left_join(sf_metrics_year_CA_ep, sf_metrics, by = "hyear")
+  sf_metrics <- left_join(sf_metrics_year_CA_ep, sf_metrics, by = "hyear")
 
 # }
   
-
-
 
 ## PREPARE resulting metrics for plotting
 ## EXCLUDE Q50 and Q95 from plotting to reduce clutter, then melt dataframe
@@ -333,12 +445,12 @@ colnames(sf_metrics_melt) <- c("Year", "Metric", "Discharge")
   # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_CA/CA_hd/CA_", i, "_metrics_hd.png", sep = ""), width = 757, height = 464, unit = "px")
   
   # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_MI/MI_long/MI_", i, "_metrics_long.png", sep = ""), width = 757, height = 464, unit = "px")
-  png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_KS/KS_long/KS_", i, "_metrics_long.png", sep = ""), width = 757, height = 464, unit = "px")
+  # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_KS/KS_long/KS_", i, "_metrics_long.png", sep = ""), width = 757, height = 464, unit = "px")
   # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_CA/CA_long/CA_", i, "_metrics_long.png", sep = ""), width = 757, height = 464, unit = "px")
   
   # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_MI/MI_ep/MI_", i, "_metrics_ep.png", sep = ""), width = 757, height = 464, unit = "px")
   # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_KS/KS_ep/KS_", i, "_metrics_ep.png", sep = ""), width = 757, height = 464, unit = "px")
-  # png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_CA/CA_ep/CA_", i, "_metrics_ep.png", sep = ""), width = 757, height = 464, unit = "px")
+  png(file = paste("~/GradSchool/DiscoverStreams/plots/sfmetrics_CA/CA_ep/CA_", i, "_metrics_ep.png", sep = ""), width = 757, height = 464, unit = "px")
   
   
 p_metrics_melt <- ggplot2::ggplot(sf_metrics_melt, aes(x = Year, y = Discharge, color = Metric, linetype = Metric, size = Metric)) +
@@ -364,7 +476,7 @@ p_metrics_melt <- ggplot2::ggplot(sf_metrics_melt, aes(x = Year, y = Discharge, 
   
 }
 
-## SAVE resulting watershed object to dataframe
+## SAVE resulting watershed dataframe to dataframe
 ws_040500MI_hd <- ws_040500MI
 ws_110300KS_hd <- ws_110300KS
 ws_180102CA_hd <- ws_180102CA

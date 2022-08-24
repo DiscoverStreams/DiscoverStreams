@@ -97,7 +97,7 @@ huc180102CA_1951sel <- huc180102CA
 huc180102CA_1962sel <- subset(huc180102CA, startDate == "1961-10-01", select = c(1:8))
 
 
-## SUBSET high-density (HD) data from climate neutral year, SAVE to watershed object to build on with relevant metrics while preserving original selected data
+## SUBSET high-density (HD) data from climate neutral year, SAVE to watershed dataframe to build on with relevant metrics while preserving original selected data
 huc040500MI_hd <- subset(huc040500MI, startDate == "1959-10-01", select = c(1:8))
 huc040500MI_hd <- subset(huc040500MI_hd, endDate == "2021-09-30", select = c(1:8))
 ws_040500MI_hd <- huc040500MI_hd
@@ -110,7 +110,7 @@ huc180102CA_hd <- subset(huc180102CA, startDate == "1961-10-01", select = c(1:8)
 huc180102CA_hd <- subset(huc180102CA_hd, endDate == "2021-09-30", select = c(1:8))
 ws_180102CA_hd <- huc180102CA_hd
 
-## SAVE all records from all stations with more than 30 years data and SAVE to watershed object to build on while preserving original selected data
+## SAVE all records from all stations with more than 30 years data and SAVE to watershed dataframe to build on while preserving original selected data
 huc040500MI_all <- huc040500MI
 ws_040500MI_all <- huc040500MI_all
 
@@ -120,7 +120,7 @@ ws_110300KS_all <- huc110300KS_all
 huc180102CA_all <- huc180102CA
 ws_180102CA_all <- huc180102CA_all
 
-## SUBSET by long-period data and SAVE to watershed object to build on while preserving original selected data
+## SUBSET by long-period data and SAVE to watershed dataframe to build on while preserving original selected data
 huc040500MI_long <- huc040500MI
 ws_040500MI_long <- huc040500MI_long
 
@@ -130,7 +130,7 @@ ws_110300KS_long <- huc110300KS_long
 huc180102CA_long <- huc180102CA
 ws_180102CA_long <- huc180102CA_long
 
-## SUBSET early period (EP) data and SAVE to watershed object to build on with relevant metrics while preserving original selected data
+## SUBSET early period (EP) data and SAVE to watershed dataframe to build on with relevant metrics while preserving original selected data
 huc040500MI_ep <- huc040500MI
 ws_040500MI_ep <- huc040500MI_ep
 
@@ -152,7 +152,7 @@ write.csv(ws_180102CA, "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_1
 
 ###########################################################################################
 ### STREAMFLOW from NWIS ###
-## CHOOSE watershed object to work with by choosing watershed object or selected data of different time periods
+## CHOOSE watershed dataframe to work with by choosing watershed or selected data of different time periods
 ws_040500MI <- ws_040500MI_hd
 ws_110300KS <- ws_110300KS_hd
 ws_180102CA <- ws_180102CA_hd
@@ -192,20 +192,20 @@ i = 1
 
 ## CHOOSE watershed before running for loop
 for (i in 2:nrow(ws_040500MI)) {
-        site_number <- ws_040500MI$site_no[i]
+    site_number <- ws_040500MI$site_no[i]
 # for (i in 2:nrow(ws_110300KS)) {
-#       site_number <- ws_110300KS$site_no[i]
+#     site_number <- ws_110300KS$site_no[i]
 # for (i in 2:nrow(ws_180102CA)) {
-#   site_number <- ws_180102CA$site_no[i]
-  
+#     site_number <- ws_180102CA$site_no[i]
+
   ## RETRIEVE site info and streamflow data for gage station
   site_info <- dataRetrieval::readNWISsite(site_number)
   site_name <- site_info$station_nm
-  
+
   raw_daily <- dataRetrieval::readNWISdv(site_number, parameter_code, start_date, end_date)
   raw_daily <- subset(raw_daily, select = c(3,4))
   colnames(raw_daily) <- c("Date", site_name)
-  
+
   ## only run for i = 1 to prime dataframe for joining, then comment out and run for loop
   # sf_040500MI <- raw_daily
   # sf_110300KS <- raw_daily
@@ -218,7 +218,7 @@ for (i in 2:nrow(ws_040500MI)) {
   
 }
 
-## SAVE resulting streamflow object to dataframe
+## SAVE resulting streamflow data to dataframe
 sf_040500MI_hd <- sf_040500MI
 sf_110300KS_hd <- sf_110300KS
 sf_180102CA_hd <- sf_180102CA
@@ -238,7 +238,7 @@ sf_180102CA_all <- sf_180102CA
 
 ######################################################################################
 ### WATER USE (NWIS) ###
-## CHOOSE watershed object to work with by choosing watershed object or selected data of different time periods
+## CHOOSE watershed dataframe to work with by choosing watershed or selected data of different time periods
 ws_040500MI <- ws_040500MI_hd
 ws_110300KS <- ws_110300KS_hd
 ws_180102CA <- ws_180102CA_hd
@@ -301,16 +301,16 @@ for (i in 2:nrow(ws_180102CA)) {
 }
 
 
-## SAVE resulting water use object to dataframe
-wu_040500MI_hd <- wu_040500MI
-wu_110300KS_hd <- wu_110300KS
-wu_180102CA_hd <- wu_180102CA
+## SAVE resulting water-use data to dataframe
+wuNWIS_040500MI_hd <- wu_040500MI
+wuNWIS_110300KS_hd <- wu_110300KS
+wuNWIS_180102CA_hd <- wu_180102CA
 
-wu_040500MI_long <- wu_040500MI
-wu_110300KS_long <- wu_110300KS
-wu_180102CA_long <- wu_180102CA
+wuNWIS_040500MI_long <- wu_040500MI
+wuNWIS_110300KS_long <- wu_110300KS
+wuNWIS_180102CA_long <- wu_180102CA
 
-wu_040500MI_ep <- wu_040500MI
-wu_110300KS_ep <- wu_110300KS
-wu_180102CA_ep <- wu_180102CA
+wuNWIS_040500MI_ep <- wu_040500MI
+wuNWIS_110300KS_ep <- wu_110300KS
+wuNWIS_180102CA_ep <- wu_180102CA
 
