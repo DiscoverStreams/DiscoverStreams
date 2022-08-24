@@ -489,7 +489,7 @@ ws_040500MI_ep <- ws_040500MI
 ws_110300KS_ep <- ws_110300KS
 ws_180102CA_ep <- ws_180102CA
 
-## SAVE CSV of watershed data, CHOOSE watershed before running for loop
+## SAVE CSV of watershed data
 write.csv(ws_040500MI, "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_040500MI_hd_1960-2021.csv")
 write.csv(ws_110300KS, "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_110300KS_hd_1963-2021.csv")
 write.csv(ws_180102CA,"~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_180102CA_hd_1962-2021.csv")

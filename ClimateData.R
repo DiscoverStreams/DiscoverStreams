@@ -45,31 +45,62 @@ cl_180102CA_P_PET <- bind_rows(cl_180102CA_PET, cl_180102CA_PRCP) %>%
   data.frame()
 
 ## SELECT watersheds specific to high-density gage stations of interest, ** MI has all watersheds represented by a gage station
-cl_040500MI_P_PET_hd <- cl_040500MI_P_PET
+cl_040500MI_P_PET_hd <- cl_040500MI_P_PET[ , c("X04050001", "X04050003", "X04050004", "X04050005", "X04050006", "X04050007")]
 cl_110300KS_P_PET_hd <- cl_110300KS_P_PET[ , c("X11030001", "X11030004", "X11030005", "X11030008", "X11030009", "X11030010", "X11030011", "X11030012", "X11030013", "X11030016", "X11030017", "X11030018")]
 cl_180102CA_P_PET_hd <- cl_180102CA_P_PET[ , c("X18010201", "X18010202", "X18010204", "X18010206", "X18010207", "X18010208", "X18010209", "X18010210", "X18010211")]
 
 ## SELECT watersheds specific to long-term gage stations of interest
 cl_040500MI_P_PET_long <- cl_040500MI_P_PET[ , c("X04050004", "X04050006")]
 cl_110300KS_P_PET_long <- cl_110300KS_P_PET[ , c("X11030001", "X11030003", "X11030012", "X11030013", "X11030018")]
-cl_180102CA_P_PET_long <- cl_180102CA_P_PET[ , c("X18010201", "X18010202", "X18010206", "X18010210", "X18010211", "X18010212")]
+cl_180102CA_P_PET_long <- cl_180102CA_P_PET[ , c("X18010201", "X18010202", "X18010206", "X18010207", "X18010209", "X18010210", "X18010211")]
 
+## SELECT watersheds specific to early-period gage stations of interest
+cl_040500MI_P_PET_ep <- cl_040500MI_P_PET[ , c("X04050004", "X04050006")]
+cl_110300KS_P_PET_ep <- cl_110300KS_P_PET[ , c("X11030001", "X11030004", "X11030005", "X11030012", "X11030013", "X11030018")]
+cl_180102CA_P_PET_ep <- cl_180102CA_P_PET[ , c("X18010201", "X18010202", "X18010203", "X18010204", "X18010206", "X18010207", "X18010209", "X18010210", "X18010211")]
+
+
+################################################################################
+### SPEI ###
 ## CALCULATE SPEI, exclude column 1(DATE)
-cl_040500MI_SPEI1 <- SPEI::spei(cl_040500MI_P_PET[2:8], 1)
+# cl_040500MI_SPEI1 <- SPEI::spei(cl_040500MI_P_PET[2:8], 1)
 
+## CALCULATE SPEI-12 for high-density data
+cl_040500MI_SPEI12_hd <- SPEI::spei(cl_040500MI_P_PET_hd, 12)
+    # plot(cl_040500MI_SPEI12_hd)
+
+cl_110300KS_SPEI12_hd <- SPEI::spei(cl_110300KS_P_PET_hd, 12)
+    # plot(cl_110300KS_SPEI12_hd)
+
+cl_180102CA_SPEI12_hd <- SPEI::spei(cl_180102CA_P_PET_hd, 12)
+    # plot(cl_180102CA_SPEI12_hd)
+
+## CALCULATE SPEI-12 for long-term data
 cl_040500MI_SPEI12_long <- SPEI::spei(cl_040500MI_P_PET_long, 12)
-  plot(cl_040500MI_SPEI12_long)
+    # plot(cl_040500MI_SPEI12_long)
 
 cl_110300KS_SPEI12_long <- SPEI::spei(cl_110300KS_P_PET_long, 12)
-  plot(cl_110300KS_SPEI12_long)
+    # plot(cl_110300KS_SPEI12_long)
 
-cl_180102CA_cl_SPEI12_long <- SPEI::spei(cl_180102CA_P_PET_long, 12)
-  plot(cl_180102CA_SPEI12_long)
+cl_180102CA_SPEI12_long <- SPEI::spei(cl_180102CA_P_PET_long, 12)
+    # plot(cl_180102CA_SPEI12_long)
+  
+## CALCULATE SPEI-12 for early-period data
+cl_040500MI_SPEI12_ep <- SPEI::spei(cl_040500MI_P_PET_ep, 12)
+    # plot(cl_040500MI_SPEI12_ep)
 
+cl_110300KS_SPEI12_ep <- SPEI::spei(cl_110300KS_P_PET_ep, 12)
+    # plot(cl_110300KS_SPEI12_ep)
+
+cl_180102CA_SPEI12_ep <- SPEI::spei(cl_180102CA_P_PET_ep, 12)
+    # plot(cl_180102CA_SPEI12_ep)
+
+######################################################################
+### PLOT SPEI using ggplot ###
 ## COMBINE date column with SPEI results, RENAME columns, REFORMAT date column 
-cl_040500MI_SPEI12 <- data.frame(cl_040500MI_P_PET$DATE, cl_040500MI_SPEI12[["fitted"]])
-  colnames(cl_040500MI_SPEI12) <- c("DATE", "SPEI-04050001", "SPEI-04050002", "SPEI-04050003", "SPEI-04050004", "SPEI-04050005", "SPEI-04050006", "SPEI-04050007")
-  cl_040500MI_SPEI12$DATE <- as.Date(cl_040500MI_SPEI12$DATE)
+cl_040500MI_SPEI12_hd <- data.frame(cl_040500MI_P_PET$DATE, cl_040500MI_SPEI12_hd[["fitted"]])
+  colnames(cl_040500MI_SPEI12_hd) <- c("DATE", "SPEI-04050001", "SPEI-04050003", "SPEI-04050004", "SPEI-04050005", "SPEI-04050006", "SPEI-04050007")
+  cl_040500MI_SPEI12_hd$DATE <- as.Date(cl_040500MI_SPEI12_hd$DATE)
   
 cl_110300KS_SPEI12 <- data.frame(cl_110300KS_P_PET$DATE, cl_110300KS_SPEI12[["fitted"]])
   colnames(cl_110300KS_SPEI12) <- c("DATE", "SPEI-11030001", "SPEI-11030002", "SPEI-11030003", "SPEI-11030004", "SPEI-11030005", "SPEI-11030006", "SPEI-11030007", "SPEI-11030008", "SPEI-11030009", "SPEI-11030010", "SPEI-11030011", "SPEI-11030012", "SPEI-11030013", "SPEI-11030014", "SPEI-11030015", "SPEI-11030016", "SPEI-11030017", "SPEI-11030018")

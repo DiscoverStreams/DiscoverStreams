@@ -5,11 +5,24 @@ library(ggplot2)
 library(ggfortify)
 library(ggthemes)
 library(reshape2)
+# database connection/retrieval libraries
+library(readr)
 # data analysis/statistical libraries
-library(xts)
-library(lfstat)
-library(trend)
 
+
+
+### RETRIEVE watershed dataframes from file ###
+ws_040500MI_hd <- read.csv(file = "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_040500MI_hd_1960-2021.csv", header = TRUE, row.names = 1)
+ws_110300KS_hd <- read.csv(file = "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_110300KS_hd_1963-2021.csv", header = TRUE, row.names = 1)
+ws_180102CA_hd <- read.csv(file = "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_180102CA_hd_1962-2021.csv", header = TRUE, row.names = 1)
+
+ws_040500MI_long <- read.csv(file = "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_040500MI_long.csv", header = TRUE, row.names = 1)
+ws_110300KS_long <- read.csv(file = "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_110300KS_long.csv", header = TRUE, row.names = 1)
+ws_180102CA_long <- read.csv(file = "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_180102CA_long.csv", header = TRUE, row.names = 1)
+
+ws_040500MI_ep <- read.csv(file = "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_040500MI_ep.csv", header = TRUE, row.names = 1)
+ws_110300KS_ep <- read.csv(file = "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_110300KS_ep.csv", header = TRUE, row.names = 1)
+ws_180102CA_ep <- read.csv(file = "~/GradSchool/DiscoverStreams/outputs/watershed_info/ws_180102CA_ep.csv", header = TRUE, row.names = 1)
 
 
 #############################################################
