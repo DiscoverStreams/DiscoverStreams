@@ -283,10 +283,10 @@ p_cl_110300KS_SPEI12_ep_melt
 cl_180102CA_SPEI12_ep_melt <- reshape2::melt(cl_180102CA_SPEI12_ep_df, measure.vars = 2:ncol(cl_180102CA_SPEI12_ep_df), variable.name = "Watershed", value.name = "SPEI")
 cl_180102CA_SPEI12_ep_melt$DATE <- as.Date(cl_180102CA_SPEI12_ep_melt$DATE)
 
-p_cl_180102CA_SPEI12_ep_melt <- ggplot2::ggplot(cl_180102CA_SPEI12_ep_melt, aes(x = DATE, y = SPEI, group = Watershed, color = Watershed)) +
+p_cl_180102CA_SPEI12_ep_melt <- ggplot2::ggplot(cl_180102CA_SPEI12_ep_melt, aes(x = DATE, y = SPEI, group = Watershed, fill = Watershed)) +
   geom_col() +
   geom_hline(yintercept = 0, color = "black", size = 1) +
-  scale_color_manual(values = c("darkorchid", "blue", "deepskyblue2", "turquoise3", "springgreen4", "chartreuse2", "yellow", "orange", "red3")) +
+  scale_fill_manual(values = c("violet", "darkorchid", "blue", "deepskyblue2", "springgreen4", "chartreuse2", "yellow", "orange", "red3")) +
   # scale_y_continuous(breaks = c(-2, -1, 0, 1, 2), labels = c(-2, -1, 0, 1, 2)) +
   scale_x_date(limits = as.Date(c("1900-10-01", "1940-09-30"))) +
   theme(axis.title.x = element_text(size = 26), axis.title.y = element_text(size = 26), axis.text = element_text(size = 28), legend.text = element_text(size = 18), legend.title = element_text(size = 18))
