@@ -294,6 +294,7 @@ p_cl_180102CA_SPEI12_ep_melt
 
 
 
+######################################################################################
 ### VERIFY CLIMATE NEUTRAL YEARS ###
 ## SELECT years where SPEI is neutral (+/- 0.25)
 cl_040500MI_SPEI12_hd_neutral <- cl_040500MI_SPEI12_hd_melt[cl_040500MI_SPEI12_hd_melt$SPEI <= 0.25 & cl_040500MI_SPEI12_hd_melt$SPEI >= -0.25, ]
