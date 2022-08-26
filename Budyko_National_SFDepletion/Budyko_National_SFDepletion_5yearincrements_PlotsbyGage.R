@@ -4,7 +4,7 @@
 ###################################################################################
 ###################################################################################
 
-projectPath <- "C:\\Users\\rebkm\\OneDrive\\Documents\\GitHub\\DiscoveRStreams\\Budyko_National_SFDepletion\\"
+projectPath <- "C:\\School\\R\\Projects\\Budyko_National_SFDepletion\\Budyko_National_SFDepletion_Minnesota\\"
 setwd(projectPath)
 
 ######### Get data ################################################################
@@ -20,7 +20,7 @@ library(dplyr)
 
 setwd(paste0(projectPath,"Data"))
 
-Sites <- read.csv("Basin_IDs_longterm.csv", stringsAsFactors = FALSE )
+Sites <- read.csv("Basin_IDs_MI_longterm.csv", stringsAsFactors = FALSE )
 SiteIds <- substr(Sites$site_id, 3,nchar(Sites$site_id))
 
 #setwd(paste0(projectPath,"Data\\Daily_Data"))
@@ -45,8 +45,8 @@ setwd(paste0(projectPath,"Data\\Climate"))
 
 ### CODE UPDATE: Consider writing these to csv files (for each individual station??)  
 ###               so such a large dataframe isn't being carried around
-gridmet_P_mm <- read.csv("ClimGrid_MWBM_prcp.csv", stringsAsFactors = FALSE, check.names = FALSE) 
-gridmet_PET_mm <- read.csv("ClimGrid_MWBM_PET.csv", stringsAsFactors = FALSE, check.names = FALSE) 
+gridmet_P_mm <- read.csv("gridmet_P_mm_all_CONUS_gages2_MI.csv", stringsAsFactors = FALSE, check.names = FALSE) 
+gridmet_PET_mm <- read.csv("gridmet_PET_mm_all_CONUS_gages2_MI.csv", stringsAsFactors = FALSE, check.names = FALSE) 
 
 ###################################################################################
 
@@ -65,12 +65,15 @@ library(budyko)
 ###################################################################################
 
 
+
 ### USER INPUT ###
-StartYear = 1900
+StartYear = 1950
 EndYear = 2020
 IntervalLen = 5
 
 years = seq(from=StartYear, to = EndYear - IntervalLen, by=IntervalLen)
+
+setwd(paste0(projectPath,"Data"))
 
 #initialize matrix for average values
 BudykoMatrix <- matrix(data = NA, nrow = 0, ncol = 8)
@@ -93,7 +96,7 @@ colnames(allfits) <- c("siteid", "basintype", "param", "mae", "rsq", "hs")
 
 for(i in seq_along(SiteIds)){
   
-  #i = 1
+  i = 1
   setwd(paste0(projectPath,"Data//Daily_Data"))
   
   #Prep streamflow data
@@ -134,7 +137,7 @@ for(i in seq_along(SiteIds)){
   current_P <- subset(current_P, (current_P$year>=StartYear) & (current_P$year<=EndYear))
   current_P <- rename(current_P, "Precip" = currentsite_string)
   meanP <- current_P %>% group_by(interval) %>% summarise(meanP = mean(Precip, na.rm = TRUE))
-  meanP$meanP <- meanP$meanP / 30.437
+  meanP$meanP <- meanP$meanP
   
   current_PET <- gridmet_PET_mm[,c("Date",currentsite_string)]
   current_PET$Date <- as.Date(current_PET$Date, origin = "1899-12-30")
@@ -143,7 +146,7 @@ for(i in seq_along(SiteIds)){
   current_PET <- subset(current_PET, (current_PET$year>=StartYear) & (current_PET$year<=EndYear))
   current_PET <- rename(current_PET,"PET" = currentsite_string)
   meanPET <- current_PET %>% group_by(interval) %>% summarise(meanPET = mean(PET, na.rm = TRUE))
-  meanPET$meanPET <- meanPET$meanPET / 30.437
+  meanPET$meanPET <- meanPET$meanPET 
   
   #join arrays based on interval group
   fluxes <- merge(meanP, meanPET, by = "interval")
@@ -167,6 +170,10 @@ for(i in seq_along(SiteIds)){
   
   sim1=budyko_sim(fit=fit1, method="Fu")
   
+  F <- approxfun(x=sim1$PET.P,y=sim1$AET.P)
+  fluxes$expectedAET.P <- F(fluxes$PET.P)
+  
+  
   plot <- blankBC+
     geom_line(data=sim1)+
     geom_point(data=fluxes, aes(colour = interval), size=1)+
@@ -178,11 +185,11 @@ for(i in seq_along(SiteIds)){
           panel.border = element_rect(fill  = NA),
           plot.title = element_text(hjust = 0.5),
           legend.position = c(0.8,0.3)) + 
-    coord_cartesian(xlim=c(0,3), ylim=c(0.4,1))+
+    coord_cartesian(xlim=c(.5,1.5), ylim=c(.3,1))+
     labs(title=paste0(currentsite," (",currentgroup,")")) 
     #annotate("text", x=2.5, y=0.7, label = paste0(fit1)) 
   
-  #plot
+  plot
   plotfilesave <- paste0(currentsite,"_Budyko_5yearincrmt.jpg")
   setwd(paste0(projectPath,"Plots"))
   ggsave(plot=plot, file=plotfilesave, dpi=600, width=4, height=4)
@@ -199,8 +206,8 @@ for(i in seq_along(SiteIds)){
 
 setwd(paste0(projectPath,"Data"))
 
-try(write.csv(BudykoDF, file="BudykoParameters.csv"))
-try(write.csv(allfits, file="BudykoFitSummary.csv"))
+try(write.csv(BudykoDF, file="BudykoParameters_MI_5yearinc.csv"))
+try(write.csv(allfits, file="BudykoFitSummary_MI_5yearinc.csv"))
 
 BudykoDF <- subset(BudykoDF, (BudykoDF$group == "Reference" |BudykoDF$group ==  "Impacted"))
 BudykoReference <- subset(BudykoDF, (BudykoDF$group == "Reference"))

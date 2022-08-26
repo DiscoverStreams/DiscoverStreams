@@ -4,7 +4,7 @@
 ###################################################################################
 ###################################################################################
 
-projectPath <- "C:\\Users\\rebkm\\OneDrive\\Documents\\GitHub\\DiscoveRStreams\\Budyko_National_SFDepletion\\"
+projectPath <- "C:\\School\\R\\Projects\\Budyko_National_SFDepletion\\Budyko_National_SFDepletion_AllStations\\"
 setwd(projectPath)
 
 ######### Get data ################################################################
@@ -20,14 +20,15 @@ library(dplyr)
 
 setwd(paste0(projectPath,"Data"))
 
-Sites <- read.csv("Basin_IDs_longterm.csv", stringsAsFactors = FALSE )
+Sites <- read.csv("Basin_IDs.csv", stringsAsFactors = FALSE )
 SiteIds <- substr(Sites$site_id, 3,nchar(Sites$site_id))
 
-#setwd(paste0(projectPath,"Data\\Daily_Data"))
 
 ### Loop through Sites and write a csv file for each station with parameter 00060 
 ### Parameter "00060" = Discharge, cubic feet per second
 ### The csv files will be written 
+
+setwd(paste0(projectPath,"Data\\Daily_Data"))
 
 #for(i in seq_along(SiteIds)){
 # i = 1
@@ -45,8 +46,8 @@ setwd(paste0(projectPath,"Data\\Climate"))
 
 ### CODE UPDATE: Consider writing these to csv files (for each individual station??)  
 ###               so such a large dataframe isn't being carried around
-gridmet_P_mm <- read.csv("ClimGrid_MWBM_prcp.csv", stringsAsFactors = FALSE, check.names = FALSE) 
-gridmet_PET_mm <- read.csv("ClimGrid_MWBM_PET.csv", stringsAsFactors = FALSE, check.names = FALSE) 
+gridmet_P_mm <- read.csv("ClimGrid_MWBM_P_CA_MI_KS_072722.csv", stringsAsFactors = FALSE, check.names = FALSE, colClasses = "numeric") 
+gridmet_PET_mm <- read.csv("ClimGrid_MWBM_PET_CA_MI_KS_072722.csv", stringsAsFactors = FALSE, check.names = FALSE, colClasses = "numeric") 
 
 ###################################################################################
 
@@ -59,6 +60,7 @@ library(foreign)
 library(tidyverse)
 library(EGRET)
 library(budyko)
+library(Kendall)
 
 ### Loop through stations, compile flow and climate data in units of mm/d 
 ### Build matrix with average values for years as specified in user input
@@ -66,15 +68,17 @@ library(budyko)
 
 
 ### USER INPUT ###
-StartYear = 1950
+StartYear = 1960
 EndYear = 2020
 IntervalLen = 1
 
 years = seq(from=StartYear, to = EndYear - IntervalLen, by=IntervalLen)
 
 #initialize matrix for average values
-BudykoMatrix <- matrix(data = NA, nrow = 0, ncol = 8)
-colnames(BudykoMatrix) <- c("siteID", "interval", "group", "meanSF", "meanP", "meanPET", "PET.P", "AET.P")
+BudykoMatrix <- matrix(data = NA, nrow = 0, ncol = 10)
+colnames(BudykoMatrix) <- c("siteID", "interval", "group","ProjectArea", "meanSF", "meanP", "meanPET", "PET.P", "AET.P", "Deviances")
+
+setwd(paste0(projectPath,"Data"))
 
 try(write.csv(BudykoMatrix, file="BudykoParameters.csv"))
 BudykoDF <- read.csv("BudykoParameters.csv")
@@ -93,7 +97,7 @@ colnames(allfits) <- c("siteid", "basintype", "param", "mae", "rsq", "hs")
 
 for(i in seq_along(SiteIds)){
   
-  #i = 1
+  #i = 63
   setwd(paste0(projectPath,"Data//Daily_Data"))
   
   #Prep streamflow data
@@ -101,8 +105,8 @@ for(i in seq_along(SiteIds)){
   #read in streamflow data and subsect for the specified years
   current <- read.csv(paste0(SiteIds[i],".csv"), stringsAsFactors = FALSE)
   currentsite <- (SiteIds[i])
-  currentsite_string <- substr(currentsite,2,8)
-  
+  currentsite_string <- as.character(as.numeric(currentsite))
+
   current$Date <- as.Date(current$Date, format = "%Y-%m-%d")
   current$year <- year(current$Date)
   current$month <- month(current$Date)
@@ -116,8 +120,10 @@ for(i in seq_along(SiteIds)){
   current$mmd <- 1000*(current$X_00060_00003*0.028316847*86400)/(currentarea*1000000)
   
   #get group designation from gagedetails
-  currentgroup <- subset(gagedetails, gagedetails$site_id == currentsite)
-  currentgroup = currentgroup$Group
+  currentgagedetails <- subset(gagedetails, gagedetails$site_id == currentsite)
+  currentgroup = currentgagedetails$Group
+  projectarea = currentgagedetails$Area
+  currentname = currentgagedetails$station_nm
   
   ### Count how many non NA values there are in x_00060_00003 for that given year
   ### If there are more than 350 complete values for that climate year, add to complete years
@@ -139,6 +145,8 @@ for(i in seq_along(SiteIds)){
   current_P$interval <- round_any(current_P$climyear, IntervalLen, f=floor)
   current_P <- subset(current_P, (current_P$climyear>=StartYear) & (current_P$climyear<=EndYear))
   current_P <- rename(current_P, "Precip" = currentsite_string)
+  try(write.csv(current_P, file="PReview.csv"))
+  
   meanP <- current_P %>% group_by(interval) %>% summarise(meanP = mean(Precip, na.rm = TRUE))
   meanP$meanP <- meanP$meanP / 30.437
   
@@ -159,11 +167,12 @@ for(i in seq_along(SiteIds)){
   fluxes <- merge(fluxes, meanSF, by = "interval")
   fluxes$siteID <- currentsite
   fluxes$group <- currentgroup
+  fluxes$projectarea <- projectarea
   fluxes$PET.P = fluxes$meanPET / fluxes$meanP
   fluxes$AET.P = (1 - fluxes$meanSF / fluxes$meanP)
   
-  head(BudykoMatrix)
-  head(fluxes)
+  #head(BudykoMatrix)
+  #head(fluxes)
   
   #Budyko curve plot for the current gage with data point for each increment of years
   
@@ -176,9 +185,18 @@ for(i in seq_along(SiteIds)){
   fit <- cbind(c(currentgroup), fit)
   fit <- cbind(c(currentsite),fit)
   colnames(fit) <- c("siteid", "basintype", "param", "mae", "rsq", "hs")
+  fit <- as.data.frame(fit)
+  mae <- round(as.numeric(fit$mae),digits=5)
+  rsq <- round(as.numeric(fit$rsq),digits=5)
+  
   
   sim1=budyko_sim(fit=fit1, method="Fu")
   
+  #deviances from expected AET.P
+  F <- approxfun(x=sim1$PET.P,y=sim1$AET.P)
+  fluxes$expectedAET.P <- F(fluxes$PET.P)
+  fluxes$deviance <- fluxes$AET.P - fluxes$expectedAET.P
+
   plot <- blankBC+
     geom_line(data=sim1)+
     geom_point(data=fluxes, aes(colour = interval), size=1)+
@@ -190,15 +208,16 @@ for(i in seq_along(SiteIds)){
           panel.border = element_rect(fill  = NA),
           plot.title = element_text(hjust = 0.5),
           legend.position = c(0.8,0.3)) + 
-    coord_cartesian(xlim=c(0,5), ylim=c(0,1))+
-    labs(title=paste0(currentsite," (",currentgroup,")")) 
-    #annotate("text", x=2.5, y=0.7, label = paste0(fit1)) 
+    coord_cartesian(xlim=c(0,3), ylim=c(0,1))+
+    labs(title=paste0(currentsite," (",currentgroup,", ",projectarea,")"))+ 
+    annotate("text", x=2.5, y=0.7, label = paste0("mae = ",mae)) +
+    annotate("text", x=2.5, y=0.65, label = paste0("rsq = ",rsq)) 
   
   plot
-  plotfilesave <- paste0(currentsite,"_Budyko_climyear.jpg")
+  plotfilesave <- paste0(currentsite,"_Budyko_climyear_1960.jpg")
   setwd(paste0(projectPath,"Plots"))
   ggsave(plot=plot, file=plotfilesave, dpi=600, width=4, height=4)
-  
+
   
 
   #head(fluxes)
@@ -211,8 +230,17 @@ for(i in seq_along(SiteIds)){
 
 setwd(paste0(projectPath,"Data"))
 
-try(write.csv(BudykoDF, file="BudykoParameters.csv"))
-try(write.csv(allfits, file="BudykoFitSummary.csv"))
+try(write.csv(BudykoDF, file="BudykoParameters_1960.csv"))
+try(write.csv(allfits, file="BudykoFitSummary_1960.csv"))
+#try(write.csv(MK_All, file="MannKendall_LongTerm_MI_64.csv"))
+
+
+
+
+
+
+
+
 
 BudykoDF <- subset(BudykoDF, (BudykoDF$group == "Reference" |BudykoDF$group ==  "Impacted"))
 BudykoReference <- subset(BudykoDF, (BudykoDF$group == "Reference"))

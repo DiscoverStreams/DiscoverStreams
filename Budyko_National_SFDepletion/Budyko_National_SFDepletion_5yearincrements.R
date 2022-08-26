@@ -21,7 +21,7 @@ library(dplyr)
 setwd(paste0(projectPath,"Data"))
 
 
-Sites <- read.csv("Basin_IDs.csv", stringsAsFactors = FALSE )
+Sites <- read.csv("Basin_IDs_additional_sites_061222.csv", stringsAsFactors = FALSE )
 SiteIds <- substr(Sites$site_id, 3,nchar(Sites$site_id))
 
 setwd(paste0(projectPath,"Data\\Daily_Data"))
@@ -30,12 +30,12 @@ setwd(paste0(projectPath,"Data\\Daily_Data"))
 ### Parameter "00060" = Discharge, cubic feet per second
 ### The csv files will be written 
 
-#for(i in seq_along(SiteIds)){
-# i = 1
-#  try(current <- readNWISdv(siteNumber = SiteIds[i], parameterCd = "00060"))
-#  try(current$asdate <- as.Date(current$Date))
-#  try(write.csv(current,file=paste0(SiteIds[i],".csv"))) 
-#}
+for(i in seq_along(SiteIds)){
+ #i = 1
+  try(current <- readNWISdv(siteNumber = SiteIds[i], parameterCd = "00060"))
+  try(current$asdate <- as.Date(current$Date))
+  try(write.csv(current,file=paste0(SiteIds[i],".csv"))) 
+}
 
 
 ### usgs.files is a list of all the files saved in daily_data, with one file for each site
@@ -46,8 +46,8 @@ setwd(paste0(projectPath,"Data\\Climate"))
 
 ### CODE UPDATE: Consider writing these to csv files (for each individual station??)  
 ###               so such a large dataframe isn't being carried around
-gridmet_P_mm <- read.csv("ClimGrid_MWBM_prcp.csv", stringsAsFactors = FALSE, check.names = FALSE) 
-gridmet_PET_mm <- read.csv("ClimGrid_MWBM_PET.csv", stringsAsFactors = FALSE, check.names = FALSE) 
+gridmet_P_mm <- read.csv("ClimGrid_MWBM_prcp_additional_sites_061222.csv", stringsAsFactors = FALSE, check.names = FALSE) 
+gridmet_PET_mm <- read.csv("ClimGrid_MWBM_PET_additional_sites_061222.csv", stringsAsFactors = FALSE, check.names = FALSE) 
 
 ###################################################################################
 
@@ -70,7 +70,7 @@ library(EGRET)
 ### USER INPUT ###
 StartYear = 1990
 EndYear = 2020
-IntervalLen = 5
+IntervalLen = 3000
 
 years = seq(from=StartYear, to = EndYear - IntervalLen, by=IntervalLen)
 
@@ -122,7 +122,7 @@ for(i in seq_along(usgs.files)){
   completeyears <- currentcounts$year 
   
   #Add a column to current with the interval group and then calculate the average SF for each interval group
-  current$interval <- round_any(current$year, 5, f=floor)
+  current$interval <- round_any(current$year, IntervalLen, f=floor)
   meanSF <- current %>% group_by(interval) %>% summarise(meanSF = mean(mmd))
   
   
@@ -130,7 +130,7 @@ for(i in seq_along(usgs.files)){
   current_P <- gridmet_P_mm[,c("Date",currentsite_string)]
   current_P$Date <- as.Date(current_P$Date, origin = "1899-12-30")
   current_P$year <- year(current_P$Date)
-  current_P$interval <- round_any(current_P$year, 5, f=floor)
+  current_P$interval <- round_any(current_P$year, IntervalLen, f=floor)
   current_P <- subset(current_P, (current_P$year>=StartYear) & (current_P$year<=EndYear))
   current_P <- rename(current_P, "Precip" = currentsite_string)
   meanP <- current_P %>% group_by(interval) %>% summarise(meanP = mean(Precip, na.rm = TRUE))
@@ -139,7 +139,7 @@ for(i in seq_along(usgs.files)){
   current_PET <- gridmet_PET_mm[,c("Date",currentsite_string)]
   current_PET$Date <- as.Date(current_PET$Date, origin = "1899-12-30")
   current_PET$year <- year(current_PET$Date)
-  current_PET$interval <- round_any(current_PET$year, 5, f=floor)
+  current_PET$interval <- round_any(current_PET$year, IntervalLen, f=floor)
   current_PET <- subset(current_PET, (current_PET$year>=StartYear) & (current_PET$year<=EndYear))
   current_PET <- rename(current_PET,"PET" = currentsite_string)
   meanPET <- current_PET %>% group_by(interval) %>% summarise(meanPET = mean(PET, na.rm = TRUE))
