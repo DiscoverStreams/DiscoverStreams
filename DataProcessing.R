@@ -38,6 +38,22 @@ ws_110300KS <- ws_110300KS_ep
 ws_180102CA <- ws_180102CA_ep
 
 
+## ADD column for county -- grouped by time period
+## HD stations
+ws_040500MI$county <- c("Elkhart", "Elkhart", "Berrien", "Steuben", "St. Joseph", "St. Joseph", "Berrien", "Calhoun", "Calhoun", "Calhoun", "Kalamazoo", "Kalamazoo", "Jackson", "Eaton", "Ingham", "Ingham", "Ingham", "Clinton", "Ionia", "Clinton", "Ionia", "Kent", "Kent", "Barry")
+ws_110300KS$county <- c("Hamilton", "Hamilton", "Finney", "Barton", "Pawnee", "Barton", "Stafford", "Reno", "Rice", "Sedgwick", "Sedgwick", "Cowley", "Sumner", "Butler", "Cowley")
+ws_180102CA$county <- c("Klamath", "Klamath", "Klamath", "Klamath", "Klamath", "Klamath", "Siskiyou", "Siskiyou", "Siskiyou", "Siskiyou", "Siskiyou", "Humboldt", "Del Norte", "Siskiyou", "Humboldt", "Trinity", "Trinity", "Trinity")
+
+## Long stations
+ws_040500MI$county <- c("Ingham", "Ingham", "Kent")
+ws_110300KS$county <- c("Hamilton", "Finney", "Ford", "Sedgwick", "Cowley", "Cowley")
+ws_180102CA$county <- c("Klamath", "Klamath", "Klamath", "Siskiyou", "Siskiyou", "Del Norte", "Siskiyou", "Humboldt", "Trinity", "Trinity")
+
+## EP stations
+ws_040500MI$county <- c("Ingham", "Ingham", "Kent")
+ws_110300KS$county <- c("Hamilton", "Finney", "Pawnee", "Pawnee", "Sedgwick", "Cowley", "Cowley")
+ws_180102CA$county <- c("Klamath", "Klamath", "Klamath", "Klamath", "Klamath", "Klamath", "Siskiyou", "Siskiyou", "Del Norte", "Siskiyou", "Humboldt", "Trinity")
+
 ## ADD column id for indexing --- ESSENTIAL FOR MAPPING
 ws_040500MI$id <- 1:nrow(ws_040500MI)
 ws_110300KS$id <- 1:nrow(ws_110300KS)
