@@ -224,7 +224,7 @@ p_cl_040500MI_SPEI12_long_melt <- ggplot2::ggplot(cl_040500MI_SPEI12_long_melt, 
 p_cl_040500MI_SPEI12_long_melt 
 
 
-## MELT SPEI-12 results for long watersheds in KS then PLOT
+ ## MELT SPEI-12 results for long watersheds in KS then PLOT
 cl_110300KS_SPEI12_long_melt <- reshape2::melt(cl_110300KS_SPEI12_long_df, measure.vars = 2:ncol(cl_110300KS_SPEI12_long_df), variable.name = "Watershed", value.name = "SPEI")
 cl_110300KS_SPEI12_long_melt$DATE <- as.Date(cl_110300KS_SPEI12_long_melt$DATE)
 
