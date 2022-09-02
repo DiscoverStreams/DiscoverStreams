@@ -1,13 +1,14 @@
 # database connection/retrieval libraries
 library(readr)
-library(rnoaa)
 # data manipulation libraries
 library(tidyverse)
 library(lubridate)
 library(reshape2)
-library(SPEI)
 
 
+
+###############################################################
+#### MI EGLE Database ####
 
 ## READ csv files containing climate data for all watersheds
 MWBM_PET <- read.csv(file = "C:/Users/misty/OneDrive - The University of Kansas/Documents/Powell/Data/MWBM_PET_mm_KS_CA_MI_HUC8_climgrid.csv", header = TRUE, col.names = c("11030001", "11030002", "11030003", "11030004", "11030005", "11030006", "11030007", "11030008", "11030009", "11030010", "11030011", "11030012", "11030013", "11030014", "11030015", "11030016", "11030017", "11030018", "18010201", "18010202", "18010203", "18010204", "18010205", "18010206", "18010207", "18010208", "18010209", "18010210", "18010211", "18010212", "04050001", "04050002", "04050003", "04050004", "04050005", "04050006", "04050007", "DATE"))
