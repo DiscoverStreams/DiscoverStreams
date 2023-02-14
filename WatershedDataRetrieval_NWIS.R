@@ -42,10 +42,10 @@ site_select <- data.frame()
 ## CHANGE HUC06 name for for loop, years available parameter, and HUC06 dataframe to bind at end, then RUN for loop-- SET start date and end date before running for loop & CLEAR site_select and huc data frames
 # for (i in seq_along(NWISsites_040500MI)) {
 #   site_number <- NWISsites_040500MI[i]
-# for (i in seq_along(NWISsites_110300KS)) {
-#         site_number <- NWISsites_110300KS[i]
-for (i in seq_along(NWISsites_180102CA)) {
-        site_number <- NWISsites_180102CA[i]
+for (i in seq_along(NWISsites_110300KS)) {
+        site_number <- NWISsites_110300KS[i]
+# for (i in seq_along(NWISsites_180102CA)) {
+#         site_number <- NWISsites_180102CA[i]
   
   site_info <- dataRetrieval::readNWISsite(site_number)
   ## keep columns 2, 3, 7, 8, 24
@@ -70,17 +70,17 @@ for (i in seq_along(NWISsites_180102CA)) {
   site_select <- site_select[!duplicated(site_select), ]
   
   ## SELECT sites with more than 15 years (for EP data), more than 30 years data (for all records and HD data), or more than 100 years data (for long data)
-  site_select <- subset(site_select, yearsAvail >= 15, select = c(1:8))
-  # site_select <- subset(site_select, yearsAvail >= 30, select = c(1:8))
+  # site_select <- subset(site_select, yearsAvail >= 15, select = c(1:8))
+  site_select <- subset(site_select, yearsAvail >= 30, select = c(1:8))
   # site_select <- subset(site_select, yearsAvail >= 100, select = c(1:8))
   
   ## APPEND HUC06 site selected to corresponding HUC06 data frame, CHOOSE HUC06 by commenting out other HUC06 watersheds
   # huc040500MI <- rbind(huc040500MI, site_select)
   # huc040500MI <- huc040500MI[!duplicated(huc040500MI), ]
-  # huc110300KS <- rbind(huc110300KS, site_select)
-  # huc110300KS <- huc110300KS[!duplicated(huc110300KS), ]
-  huc180102CA <- rbind(huc180102CA, site_select)
-  huc180102CA <- huc180102CA[!duplicated(huc180102CA), ]
+  huc110300KS <- rbind(huc110300KS, site_select)
+  huc110300KS <- huc110300KS[!duplicated(huc110300KS), ]
+  # huc180102CA <- rbind(huc180102CA, site_select)
+  # huc180102CA <- huc180102CA[!duplicated(huc180102CA), ]
 
 }
 
@@ -158,7 +158,7 @@ ws_110300KS <- ws_110300KS_hd
 ws_180102CA <- ws_180102CA_hd
 
 ws_040500MI <- ws_040500MI_long
-ws_110300KS <- ws_110300KS_long
+ws_110300KS <- ws_110300KS_mlong_mmk
 ws_180102CA <- ws_180102CA_long
 
 ws_040500MI <- ws_040500MI_ep
@@ -178,7 +178,7 @@ start_date <- "1961-10-01"  # California HD data
 start_date <- "1951-10-01"  # All 1951 data
 start_date <- ""  # Long and EP data
 end_date <- ""  # Long data
-end_date <- "2021-09-30" # HD and 1951 data
+end_date <- "2022-09-30" # HD and 1951 data
 end_date <- "1940-09-30" # EP data
 
 ## CLEAR corresponding streamflow dataframe for each HUC06, also set HUC06 in dataframe setup and in for loop AND DOUBLE-CHECK START & END DATES
@@ -191,10 +191,10 @@ sf_180102CA <- data.frame()
 i = 1
 
 ## CHOOSE watershed before running for loop
-for (i in 2:nrow(ws_040500MI)) {
-    site_number <- ws_040500MI$site_no[i]
-# for (i in 2:nrow(ws_110300KS)) {
-#     site_number <- ws_110300KS$site_no[i]
+# for (i in 2:nrow(ws_040500MI)) {
+#     site_number <- ws_040500MI$site_no[i]
+for (i in 2:nrow(ws_110300KS)) {
+    site_number <- ws_110300KS$site_no[i]
 # for (i in 2:nrow(ws_180102CA)) {
 #     site_number <- ws_180102CA$site_no[i]
 
@@ -212,8 +212,8 @@ for (i in 2:nrow(ws_040500MI)) {
   # sf_180102CA <- raw_daily
   
   ## RUN for i >= 2, APPEND streamflow data for site selected to corresponding HUC06 streamflow data frame, CHOOSE HUC06 by commenting out other HUC06 watersheds
-  sf_040500MI <- full_join(sf_040500MI, raw_daily, by = "Date")
-  # sf_110300KS <- full_join(sf_110300KS, raw_daily, by = "Date")
+  # sf_040500MI <- full_join(sf_040500MI, raw_daily, by = "Date")
+  sf_110300KS <- full_join(sf_110300KS, raw_daily, by = "Date")
   # sf_180102CA <- full_join(sf_180102CA, raw_daily, by = "Date")
   
 }

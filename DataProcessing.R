@@ -37,6 +37,10 @@ ws_040500MI <- ws_040500MI_ep
 ws_110300KS <- ws_110300KS_ep
 ws_180102CA <- ws_180102CA_ep
 
+ws_040500MI <- ws_040500MI_all
+ws_110300KS <- ws_110300KS_all
+ws_180102CA <- ws_180102CA_all
+
 
 ## ADD column for county -- grouped by time period
 ## HD stations

@@ -56,7 +56,6 @@ ggplot(count_110300KS, aes(x = Date, y = Percent, color = Watershed)) +
   geom_point() +
   scale_color_manual(values = c("tan3")) +
   scale_x_date(date_breaks = "10 years", date_labels = "%Y") +
-  geom_vline(xintercept = as.Date(count_110300KS_min), color = "tan3") +
   ylab("Percent of Stations in Watershed with Data") 
 
 
@@ -72,17 +71,17 @@ start_date <- "1961-10-01"  # California HD data
 start_date <- "1951-10-01"  # All 1951 data
 start_date <- ""  # Long and EP data
 end_date <- ""  # Long data
-end_date <- "2021-09-30" # HD and 1951 data
+end_date <- "2022-09-30" # HD and 1951 data
 end_date <- "1940-09-30" # EP data
 
 ## SET watershed dataframe for loop
 ws_040500MI <- ws_040500MI_long
-ws_110300KS <- ws_110300KS_long 
+ws_110300KS <- ws_110300KS_mhd_mmk 
 ws_180102CA <- ws_180102CA_long
 
 ## CREATE dataframe for percent of days with data
 percentDataMI <- data.frame()
-percentDataKS <- data.frame()
+percentDataKS <- percentDataKS_hd
 percentDataCA <- data.frame()
 # percentData_all <- data.frame()
 
@@ -90,10 +89,10 @@ percentDataCA <- data.frame()
 i = 1
 
 ## CHOOSE watershed before running for loop-- SET start date and end date before running for loop
-for (i in 2:nrow(ws_040500MI)) {
-  site_number <- ws_040500MI$site_no[i]
-  # for (i in 2:nrow(ws_110300KS)) {
-  #   site_number <- ws_110300KS$site_no[i]
+# for (i in 2:nrow(ws_040500MI)) {
+#   site_number <- ws_040500MI$site_no[i]
+  for (i in 2:nrow(ws_110300KS)) {
+    site_number <- ws_110300KS$site_no[i]
   # for (i in 2:nrow(ws_180102CA)) {
   #   site_number <- ws_180102CA$site_no[i]
   
@@ -125,16 +124,18 @@ for (i in 2:nrow(ws_040500MI)) {
   # percentDataCA <- percentData
   
   ## RUN for i >=2, JOIN station data to watershed dataframe
-  percentDataMI <- rbind(percentDataMI, percentData)
-  # percentDataKS <- rbind(percentDataKS, percentData)
+  # percentDataMI <- rbind(percentDataMI, percentData)
+  percentDataKS <- rbind(percentDataKS, percentData)
   # percentDataCA <- rbind(percentDataCA, percentData)
   
 }
 
 ## SAVE resulting dataframes for percent of days with data
 percentDataMI_1958_2021_sel <- percentDataMI
-percentDataKS_long <- percentDataKS
+percentDataKS_hd <- percentDataKS
 percentDataCA_long <- percentDataCA
+
+
 
 ## PLOT tiled heatmap of percent data for year by gage station
 ggplot(percentDataMI, aes(x = Year, y = SiteName, fill = PercentData)) +
@@ -148,8 +149,8 @@ ggplot(percentDataKS, aes(x = Year, y = SiteName, fill = PercentData)) +
   geom_tile() +
   scale_fill_gradient(low = "black", high = "tan4") +
   scale_x_continuous(breaks = seq(1900, 2022, 20), minor_breaks = seq(1900, 2022, 5)) +
-  theme(panel.grid.major.x = element_line(size = 0.75), panel.grid.minor = element_line(size = 0.1)) +
-  geom_vline(xintercept = 1963, color = "black")
+  theme(panel.grid.major.x = element_line(size = 0.75), panel.grid.minor = element_line(size = 0.1), axis.title.x = element_text(size = 28), axis.title.y = element_text(size = 28), axis.text = element_text(size = 20), legend.text = element_text(size = 26), legend.title = element_text(size = 26)) + 
+  geom_vline(xintercept = 1963, color = "black", linetype = 2)
 
 ggplot(percentDataCA, aes(x = Year, y = SiteName, fill = PercentData)) +
   geom_tile() +
