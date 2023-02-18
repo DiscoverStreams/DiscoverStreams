@@ -1,2 +1,2 @@
 # DiscoverStreams
-RShiny Visualization for USGS Powell grant project
+Hydrologic signature analysis and RShiny Visualization for USGS Streaflows Depletion Powell grant project
